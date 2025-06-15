@@ -14,7 +14,6 @@ import com.simplej.core.extensions.findClosestProject
 import com.simplej.core.extensions.showError
 import org.jetbrains.plugins.gradle.util.GradleConstants
 
-
 abstract class GradleTaskAction private constructor(
     private val tasks: Set<String>
 ) : SimpleJAnAction(), ProjectViewPopupMenuItem, EditorPopupMenuItem {
