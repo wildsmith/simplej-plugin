@@ -1,0 +1,4 @@
+* @wildsmith
+/host/src/main/kotlin/ @normalsmith
+/host/src/main/kotlin/com/simplej/host/actions/github/* @wildsmith
+/playground/ @normalsmith

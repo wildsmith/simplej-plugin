@@ -1,0 +1,25 @@
+[versions]
+java-lang = "17"
+kotlin-lang = "2.1.21"
+compose = "1.8.1"
+intellij-since-build = "241"
+intellij-until-build = "251"
+intellij-release = "2024.2.3"
+android-target = "35"
+android-gradle-plugin = "8.9.1"
+intellij-gradle-plugin = "2.6.0"
+detekt-gradle-plugin = "1.23.8"
+
+[libraries]
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
+intellij-platform-gradle-plugin = { module = "org.jetbrains.intellij.platform:intellij-platform-gradle-plugin", version.ref = "intellij-gradle-plugin" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-lang" }
+detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt-gradle-plugin" }
+
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+
+[plugins]
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler-plugin = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin-lang" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-lang" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin-lang" }
