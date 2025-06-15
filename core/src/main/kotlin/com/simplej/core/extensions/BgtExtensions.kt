@@ -1,3 +1,4 @@
+// Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.core.extensions
 
 import com.intellij.openapi.application.ApplicationManager
@@ -5,8 +6,8 @@ import com.intellij.openapi.application.ApplicationManager
 /**
  * Executes a given task on IntelliJ's background thread pool.
  *
- * This function provides a convenient way to run tasks in the background without blocking
- * the IDE's UI thread. The task is executed on IntelliJ's pooled thread executor.
+ * This function provides a convenient way to run tasks in the background without blocking the IDE's UI thread. The
+ * task is executed on IntelliJ's pooled thread executor.
  *
  * Example usage:
  * ```

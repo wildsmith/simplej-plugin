@@ -1,3 +1,4 @@
+// Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.host.actions.github
 
 import com.intellij.notification.NotificationAction
@@ -145,8 +146,9 @@ class LookupCodeOwnerAction : TrackedCodeAction() {
             }
 
         companion object {
+
             /**
-             * Parses a single line from a CODEOWNERS file into a CodeownerRule.
+             * Parses a single line from a CODEOWNERS file into a [CodeOwnerRule].
              */
             fun fromString(line: String, lineNumber: Int): CodeOwnerRule? {
                 val parts = line.split("\\s+".toRegex())

@@ -1,3 +1,4 @@
+// Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.core
 
 import com.intellij.openapi.actionSystem.ActionPlaces
@@ -71,8 +72,8 @@ abstract class SimpleJAnAction : AnAction() {
     /**
      * Override this method to implement custom visibility logic.
      *
-     * By default, the action is visible if all other conditions are met.
-     * Subclasses can override this to add additional visibility requirements.
+     * By default, the action is visible if all other conditions are met. Subclasses can override this to add
+     * additional visibility requirements.
      *
      * @param event The action event
      * @param project The current project

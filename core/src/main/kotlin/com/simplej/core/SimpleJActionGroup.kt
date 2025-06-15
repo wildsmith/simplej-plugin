@@ -1,3 +1,4 @@
+// Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.core
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -11,8 +12,8 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
  * - Performs action updates in the background thread for better UI responsiveness
  * - Automatically hides the group from menus when it contains no actions
  *
- * Use this class when grouping related SimpleJ plugin actions together in menus
- * or toolbars to ensure consistent behavior and optimal performance.
+ * Use this class when grouping related SimpleJ plugin actions together in menus or toolbars to ensure consistent
+ * behavior and optimal performance.
  */
 @Suppress("ComponentNotRegistered")
 class SimpleJActionGroup : DefaultActionGroup() {
@@ -28,8 +29,7 @@ class SimpleJActionGroup : DefaultActionGroup() {
     /**
      * Updates the presentation of this action group.
      *
-     * Configures the group to be hidden from UI when it contains no actions,
-     * preventing empty menu sections.
+     * Configures the group to be hidden from UI when it contains no actions, preventing empty menu sections.
      *
      * @param event The action event containing context information
      */
