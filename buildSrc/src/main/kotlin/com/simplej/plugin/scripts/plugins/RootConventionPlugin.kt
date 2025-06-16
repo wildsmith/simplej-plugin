@@ -5,6 +5,13 @@ import com.simplej.plugin.scripts.dsl.SimpleJOptions
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+/**
+ * A Gradle convention plugin that configures common settings.
+ *
+ * This plugin provides centralized configuration for multi-project builds by:
+ * - Setting up common repositories and dependencies
+ * - Configuring project-wide Gradle settings
+ */
 abstract class RootConventionPlugin : Plugin<Project> {
 
     final override fun apply(target: Project) {

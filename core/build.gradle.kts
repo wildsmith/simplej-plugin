@@ -1,5 +1,5 @@
 plugins {
-    id("simplej.java.library")
+    id("simplej.java-library")
     id("org.jetbrains.intellij.platform.module")
 }
 

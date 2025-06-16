@@ -20,7 +20,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("JavaLibraryConventionPlugin") {
-            id = "simplej.java.library"
+            id = "simplej.java-library"
             implementationClass = "com.simplej.plugin.scripts.plugins.JavaLibraryConventionPlugin"
         }
         create("AndroidLibraryConventionPlugin") {

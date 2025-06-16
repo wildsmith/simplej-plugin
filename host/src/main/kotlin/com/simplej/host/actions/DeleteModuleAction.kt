@@ -3,13 +3,21 @@ package com.simplej.host.actions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.simplej.core.ProjectViewPopupMenuItem
 import com.simplej.core.SimpleJAnAction
+import com.simplej.core.extensions.currentFile
+import com.simplej.core.extensions.findClosestProject
 
 class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
 
+    @Suppress("ReturnCount")
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
-        TODO("Check to ensure the module is a module that can be deleted, unlike gradle/dist/config/etc")
+        val projectFile = event.currentFile?.findClosestProject(project)
+            ?: return super.shouldShow(event, project)
+        val rootProject = ProjectRootManager.getInstance(project).contentRoots.firstOrNull()
+            ?: return super.shouldShow(event, project)
+        return projectFile.path != rootProject.path
     }
 
     override fun actionPerformed(event: AnActionEvent) {

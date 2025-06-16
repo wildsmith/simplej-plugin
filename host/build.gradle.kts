@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler.plugin)
-    id("simplej.java.library")
+    id("simplej.java-library")
     id("org.jetbrains.intellij.platform")
 }
 

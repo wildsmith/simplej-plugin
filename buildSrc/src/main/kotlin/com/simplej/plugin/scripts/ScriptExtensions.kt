@@ -51,7 +51,7 @@ internal fun Project.getDetektGradleVersion() =
 internal fun Project.android(configuration: BaseExtension.() -> Unit) =
     extensions.configure(BaseExtension::class.java, configuration)
 
-internal fun Project.androidLib(configuration: LibraryExtension.() -> Unit) =
+internal fun Project.androidLibrary(configuration: LibraryExtension.() -> Unit) =
     extensions.configure(LibraryExtension::class.java, configuration)
 
 internal fun Project.lint(configuration: LintOptions.() -> Unit) =

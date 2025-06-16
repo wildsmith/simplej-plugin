@@ -7,6 +7,7 @@ import com.intellij.openapi.externalSystem.model.execution.ExternalSystemTaskExe
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.task.TaskCallback
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
+import com.intellij.openapi.project.Project
 import com.simplej.core.EditorPopupMenuItem
 import com.simplej.core.ProjectViewPopupMenuItem
 import com.simplej.core.SimpleJAnAction
@@ -14,6 +15,7 @@ import com.simplej.core.extensions.currentFile
 import com.simplej.core.extensions.findClosestProject
 import com.simplej.core.extensions.showError
 import org.jetbrains.plugins.gradle.util.GradleConstants
+import java.io.File
 
 /**
  * Abstract base class for actions that execute Gradle tasks within the IDE.
@@ -291,7 +293,30 @@ object BuildTaskAction : GradleTaskAction("build")
  * @see GradleTaskAction
  * @see <a href="https://developer.android.com/studio/test/test-in-android-studio">Testing in Android Studio</a>
  */
-object ConnectedAndroidTestTaskAction : GradleTaskAction("connectedAndroidTest")
+@Suppress("ReturnCount")
+object ConnectedAndroidTestTaskAction : GradleTaskAction("connectedAndroidTest") {
+
+    override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
+        val projectFile = event.currentFile?.findClosestProject(project) ?: return super.shouldShow(event, project)
+        val buildFile = File("${projectFile.path}/build.gradle.kts")
+        if (!buildFile.exists()) {
+            File("${projectFile.path}/build.gradle")
+            if (!buildFile.exists()) {
+                return super.shouldShow(event, project)
+            }
+        }
+        var isLikelyAndroidProject = false
+        buildFile.useLines { lines ->
+            for (line in lines) {
+                if (line.contains(".android.") || line.contains("android {")) {
+                    isLikelyAndroidProject = true
+                    break
+                }
+            }
+        }
+        return isLikelyAndroidProject
+    }
+}
 
 /**
  * Action to run all types of tests in the project via Gradle.

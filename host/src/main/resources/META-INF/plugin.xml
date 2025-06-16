@@ -55,15 +55,15 @@
                 text="Run..."
                 popup="true">
                 <action
-                    id="com.simplej.DetektTaskAction"
-                    class="com.simplej.host.actions.DetektTaskAction"
-                    icon="/icons/expui/kotlin.svg"
-                    text="Detekt"/>
-                <action
                     id="com.simplej.CheckstyleTaskAction"
                     class="com.simplej.host.actions.CheckstyleTaskAction"
                     icon="AllIcons.FileTypes.Java"
                     text="Checkstyle"/>
+                <action
+                    id="com.simplej.DetektTaskAction"
+                    class="com.simplej.host.actions.DetektTaskAction"
+                    icon="/icons/expui/kotlin.svg"
+                    text="Detekt"/>
                 <action
                     id="com.simplej.LintTaskAction"
                     class="com.simplej.host.actions.LintTaskAction"

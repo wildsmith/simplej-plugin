@@ -4,11 +4,10 @@ package com.simplej.plugin.scripts
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.withType
 
 internal fun Project.configureLint() {
     if (plugins.hasPlugin("com.android.library")) {
-        androidLib {
+        androidLibrary {
             lint {
                 abortOnError = true
                 warningsAsErrors = true
