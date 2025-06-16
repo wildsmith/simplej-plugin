@@ -5,10 +5,10 @@ import com.intellij.notification.NotificationAction
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.VirtualFile
 import com.simplej.base.extensions.currentFile
 import com.simplej.base.extensions.currentFiles
+import com.simplej.base.extensions.getRootProjectFile
+import com.simplej.base.extensions.getCodeOwnersFile
 import com.simplej.base.extensions.openInIde
 import com.simplej.base.extensions.showError
 import com.simplej.base.extensions.showNotification
@@ -19,12 +19,12 @@ import java.nio.file.Paths
 
 /**
  * An action that looks up code owners for the currently selected file based on the GitHub CODEOWNERS file.
- * 
+ *
  * This action:
  * - Only shows when exactly one file is selected and a CODEOWNERS file exists in the .github directory
  * - Reads and parses the CODEOWNERS file to identify the code owners for the selected file
  * - Displays a notification with the code owners and provides a link to open the CODEOWNERS file
- * 
+ *
  * The action follows GitHub's CODEOWNERS file format and pattern matching rules, supporting:
  * - Basic path patterns
  * - Directory wildcards (*)
@@ -38,24 +38,24 @@ class LookupCodeOwnerAction : GithubTrackedCodeAction() {
         if (event.currentFiles.size != 1) {
             return false
         }
-        val projectFile = ProjectRootManager.getInstance(project).contentRoots.firstOrNull() ?: return false
-        return getCodeOwnersFile(projectFile).exists()
+        val rootProjectFile = event.currentFile?.getRootProjectFile(project) ?: return false
+        return rootProjectFile.getCodeOwnersFile().exists()
     }
 
     @Suppress("ReturnCount")
     override fun actionPerformed(event: AnActionEvent) {
-        val project = event.project ?: return event.showError(
-            "No valid project found within the workspace."
-        )
-        val projectFile = ProjectRootManager.getInstance(project).contentRoots.firstOrNull() ?: return event.showError(
-            "No valid project found within the workspace."
-        )
         val currentFile = event.currentFile ?: return event.showError(
             "No valid file found within the project workspace."
         )
+        val project = event.project ?: return event.showError(
+            "No valid project found within the workspace."
+        )
+        val rootProjectFile = currentFile.getRootProjectFile(project) ?: return event.showError(
+            "No valid project found within the workspace."
+        )
 
-        val codeOwnersFile = getCodeOwnersFile(projectFile)
-        val codeOwnerRule = CodeOwnerIdentifier(getCodeOwnersFile(projectFile))
+        val codeOwnersFile = rootProjectFile.getCodeOwnersFile()
+        val codeOwnerRule = CodeOwnerIdentifier(codeOwnersFile)
             .findCodeOwnerRule(currentFile.path.substringAfter(project.name))
             ?: return event.showError("Unable to find code owner rule for file: ${currentFile.path}")
 
@@ -64,21 +64,19 @@ class LookupCodeOwnerAction : GithubTrackedCodeAction() {
             actions = mutableSetOf<AnAction>().apply {
                 add(
                     NotificationAction.createSimpleExpiring("CODEOWNERS") {
-                        event.openInIde(codeOwnersFile, codeOwnerRule.lineNumber)
+                        event.openInIde(codeOwnersFile, codeOwnerRule.humanReadableLineNumber)
                     }
                 )
             }
         )
     }
 
-    private fun getCodeOwnersFile(projectFile: VirtualFile) = File("${projectFile.path}/.github/CODEOWNERS")
-
     /**
      * Identifies code owners for a given file path based on a CODEOWNERS file.
      *
      * @param codeOwnersFile The CODEOWNERS file to parse. Defaults to ".github/CODEOWNERS".
      */
-    private class CodeOwnerIdentifier(private val codeOwnersFile: File) {
+    internal class CodeOwnerIdentifier(private val codeOwnersFile: File) {
 
         private var rules: List<CodeOwnerRule>
 
@@ -111,6 +109,17 @@ class LookupCodeOwnerAction : GithubTrackedCodeAction() {
             // Find the first rule that matches, which corresponds to the last matching rule in the original file.
             return rules.firstOrNull { it.matches(filePath) }
         }
+
+        /**
+         * Finds all matching code owner rules for a specific file path.
+         *
+         * @param filePath The path to the file to check (e.g., "src/main/kotlin/com/mycompany/core/User.kt").
+         * @return A list of owner strings (e.g., ["@security-team", "@core-leads"]), or null if no owner is found.
+         */
+        fun findAllCodeOwnerRules(filePath: String): Set<CodeOwnerRule> {
+            // Collect all of the matching rules
+            return rules.filterTo(mutableSetOf()) { it.matches(filePath) }
+        }
     }
 
     /**
@@ -119,10 +128,14 @@ class LookupCodeOwnerAction : GithubTrackedCodeAction() {
      * @param pattern The file path pattern.
      * @param owners The list of owners for that pattern.
      */
-    private data class CodeOwnerRule(
+    internal data class CodeOwnerRule(
         val pattern: String,
         val owners: List<String>,
-        val lineNumber: Int
+        /**
+         * This is the human-readable line number, subtract 1 from it to interact with
+         * the actual line number in code.
+         */
+        val humanReadableLineNumber: Int
     ) {
         private val pathMatcher: PathMatcher
 

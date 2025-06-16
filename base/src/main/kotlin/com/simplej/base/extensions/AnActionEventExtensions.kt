@@ -61,6 +61,16 @@ fun AnActionEvent.openInIde(file: File, line: Int? = null) {
     }
 }
 
+/**
+ * Synchronizes the Gradle project in the IDE.
+ *
+ * This extension function attempts to refresh/sync the Gradle project by:
+ * 1. First trying to execute the "Gradle.RefreshAllProjects" action
+ * 2. If that's not available, falling back to "Android.SyncProject" action
+ *
+ * This is useful when programmatic changes require the Gradle project to be resynced to reflect the updates in the IDE.
+ */
 fun AnActionEvent.gradleSync() {
     ActionManager.getInstance().getAction("Gradle.RefreshAllProjects")?.actionPerformed(this)
+        ?: ActionManager.getInstance().getAction("Android.SyncProject")?.actionPerformed(this)
 }

@@ -3,11 +3,10 @@ package com.simplej.base.extensions
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
 import java.io.File
 
 /**
@@ -44,13 +43,30 @@ val AnActionEvent.currentFiles: Array<VirtualFile>
 fun File.toVirtualFile(): VirtualFile? =
     LocalFileSystem.getInstance().findFileByIoFile(this)
 
-fun VirtualFile.toFile(): File =
-    VfsUtil.virtualToIoFile(this)
+/**
+ * Gets the root project file for the workspace.
+ *
+ * @param project The IntelliJ project context
+ * @return The root [VirtualFile] with the shortest path length, or null if no root is found
+ */
+fun VirtualFile.getRootProjectFile(project: Project): VirtualFile? =
+    findAllProjectRoots(project).minByOrNull { it.path.length }
 
+/**
+ * Finds all Gradle project roots in the given project.
+ *
+ * Identifies directories that:
+ * - Are content roots in the project
+ * - Are not named "buildSrc"
+ * - Contain a build.gradle.kts file
+ *
+ * @param project The IntelliJ project context
+ * @return Set of [VirtualFile]s representing all valid Gradle project roots
+ */
 fun VirtualFile.findAllProjectRoots(project: Project): Set<VirtualFile> =
     ProjectRootManager.getInstance(project).contentRoots
         .filterTo(mutableSetOf()) {
-            name != "buildSrc" && File(it.path, "build.gradle.kts").exists()
+            name != "buildSrc" && it.getBuildFile().exists()
         }
 
 /**
@@ -69,10 +85,31 @@ fun VirtualFile.findClosestProject(project: Project): VirtualFile? =
         .reversed()
         .firstOrNull { path.startsWith(it.path) }
 
+/**
+ * Locates and returns the Gradle build file (build.gradle.kts or build.gradle) in the current directory.
+ *
+ * @return The build file as a [File] object, or null if neither build.gradle.kts nor build.gradle exists
+ */
 fun VirtualFile.getBuildFile(): File? {
-    var buildFile = File("$path/build.gradle.kts")
+    var settingsFile = File("$path/build.gradle.kts")
+    if (!settingsFile.exists()) {
+        settingsFile = File("$path/build.gradle")
+        if (!settingsFile.exists()) {
+            return null
+        }
+    }
+    return settingsFile
+}
+
+/**
+ * Locates and returns the Gradle settings file (settings.gradle.kts or settings.gradle) in the current directory.
+ *
+ * @return The settings file as a [File] object, or null if neither settings.gradle.kts nor settings.gradle exists
+ */
+fun VirtualFile.getSettingsFile(): File? {
+    var buildFile = File("$path/settings.gradle.kts")
     if (!buildFile.exists()) {
-        buildFile = File("$path/build.gradle")
+        buildFile = File("$path/settings.gradle")
         if (!buildFile.exists()) {
             return null
         }
@@ -80,9 +117,30 @@ fun VirtualFile.getBuildFile(): File? {
     return buildFile
 }
 
-fun VirtualFile.getGradlePath(project: Project): String {
-    val rootProject = findAllProjectRoots(project).minByOrNull { it.path.length }
-    return path.substring(rootProject?.path?.length ?: 0).replace("/", ":")
-}
+/**
+ * Gets the path to the CODEOWNERS file in the project's .github directory.
+ *
+ * @return A [File] object representing the path to the CODEOWNERS file
+ */
+fun VirtualFile.getCodeOwnersFile(): File =
+    File("$path/.github/CODEOWNERS")
 
+/**
+ * Converts the absolute file path to a Gradle project path notation.
+ *
+ * This function:
+ * - Removes the root project path prefix
+ * - Converts directory separators (/) to Gradle path separators (:)
+ *
+ * @param project The IntelliJ project context
+ * @return The Gradle path notation as a String
+ */
+fun VirtualFile.getGradlePath(project: Project): String =
+    path.substring(getRootProjectFile(project)?.path?.length ?: 0).replace("/", ":")
+
+/**
+ * Safely checks if a nullable File exists.
+ *
+ * @return true if the file is not null and exists, false otherwise
+ */
 fun File?.exists(): Boolean = this != null && exists()

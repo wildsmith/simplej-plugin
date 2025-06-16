@@ -16,9 +16,7 @@ import com.simplej.base.extensions.exists
 import com.simplej.base.extensions.findClosestProject
 import com.simplej.base.extensions.getBuildFile
 import com.simplej.base.extensions.showError
-import com.simplej.base.extensions.toFile
 import org.jetbrains.plugins.gradle.util.GradleConstants
-import java.io.File
 
 /**
  * Abstract base class for actions that execute Gradle tasks within the IDE.
