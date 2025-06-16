@@ -17,7 +17,21 @@ import java.nio.file.FileSystems
 import java.nio.file.PathMatcher
 import java.nio.file.Paths
 
-class LookupCodeOwnerAction : TrackedCodeAction() {
+/**
+ * An action that looks up code owners for the currently selected file based on the GitHub CODEOWNERS file.
+ * 
+ * This action:
+ * - Only shows when exactly one file is selected and a CODEOWNERS file exists in the .github directory
+ * - Reads and parses the CODEOWNERS file to identify the code owners for the selected file
+ * - Displays a notification with the code owners and provides a link to open the CODEOWNERS file
+ * 
+ * The action follows GitHub's CODEOWNERS file format and pattern matching rules, supporting:
+ * - Basic path patterns
+ * - Directory wildcards (*)
+ * - Recursive wildcards (**)
+ * - Directory-specific patterns (ending with /)
+ */
+class LookupCodeOwnerAction : GithubTrackedCodeAction() {
 
     @Suppress("ReturnCount")
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {

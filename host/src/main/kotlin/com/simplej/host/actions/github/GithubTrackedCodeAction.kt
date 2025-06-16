@@ -13,7 +13,12 @@ import com.simplej.core.SimpleJAnAction
 import com.simplej.core.extensions.currentFiles
 import git4idea.GitUtil
 
-abstract class TrackedCodeAction : SimpleJAnAction(), ProjectViewPopupMenuItem, EditorPopupMenuItem {
+/**
+ * An abstract base class for GitHub-specific actions that integrate with GitHub functionality.
+ *
+ * This class provides specialized functionality for actions that interact with GitHub repositories and features.
+ */
+abstract class GithubTrackedCodeAction : SimpleJAnAction(), ProjectViewPopupMenuItem, EditorPopupMenuItem {
 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean =
         event.currentFiles.ifEmpty {

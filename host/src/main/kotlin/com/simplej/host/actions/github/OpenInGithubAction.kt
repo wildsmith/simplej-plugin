@@ -11,7 +11,24 @@ import com.simplej.core.extensions.executeBackgroundTask
 import com.simplej.core.extensions.findClosestProject
 import com.simplej.core.extensions.showError
 
-class OpenInGithubAction : TrackedCodeAction() {
+/**
+ * An action that opens the current file or selection in GitHub.
+ *
+ * This action:
+ * - Opens GitHub in the default browser
+ * - Navigates to the exact file
+ *
+ * When activated, it will:
+ * - For a single file: Open the file in GitHub
+ * - For multiple selected files: Open each file in a separate browser tab
+ * - For a directory: Open the directory view in GitHub
+ *
+ * Note: This action requires:
+ * - An active internet connection
+ * - A properly configured GitHub remote in the Git repository
+ * - Appropriate access rights to the GitHub repository
+ */
+class OpenInGithubAction : GithubTrackedCodeAction() {
 
     @Suppress("ReturnCount")
     override fun actionPerformed(event: AnActionEvent) {

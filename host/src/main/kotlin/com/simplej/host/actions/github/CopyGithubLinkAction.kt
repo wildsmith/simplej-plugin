@@ -47,9 +47,9 @@ import java.awt.datatransfer.StringSelection
  * - Multiple files are selected
  * - GitHub remote is not configured
  *
- * @see TrackedCodeAction
+ * @see GithubTrackedCodeAction
  */
-class CopyGithubLinkAction : TrackedCodeAction() {
+class CopyGithubLinkAction : GithubTrackedCodeAction() {
 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
         return event.currentFiles.size == 1
