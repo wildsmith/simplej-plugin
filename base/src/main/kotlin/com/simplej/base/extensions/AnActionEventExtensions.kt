@@ -3,6 +3,7 @@ package com.simplej.base.extensions
 
 import com.intellij.ide.actions.OpenFileAction
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.editor.LogicalPosition
@@ -58,4 +59,8 @@ fun AnActionEvent.openInIde(file: File, line: Int? = null) {
             ?.caretModel
             ?.moveToLogicalPosition(LogicalPosition(line - 1, 0))
     }
+}
+
+fun AnActionEvent.gradleSync() {
+    ActionManager.getInstance().getAction("Gradle.RefreshAllProjects")?.actionPerformed(this)
 }

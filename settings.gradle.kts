@@ -11,5 +11,6 @@ rootProject.name = "simplej-plugin"
 include(
     ":base",
     ":plugin",
-    ":playground"
+    ":playground",
+    ":delete-me-no-references"
 )

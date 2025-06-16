@@ -7,6 +7,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.VfsUtil
 import java.io.File
 
 /**
@@ -43,6 +44,15 @@ val AnActionEvent.currentFiles: Array<VirtualFile>
 fun File.toVirtualFile(): VirtualFile? =
     LocalFileSystem.getInstance().findFileByIoFile(this)
 
+fun VirtualFile.toFile(): File =
+    VfsUtil.virtualToIoFile(this)
+
+fun VirtualFile.findAllProjectRoots(project: Project): Set<VirtualFile> =
+    ProjectRootManager.getInstance(project).contentRoots
+        .filterTo(mutableSetOf()) {
+            name != "buildSrc" && File(it.path, "build.gradle.kts").exists()
+        }
+
 /**
  * Finds the closest Gradle project root directory containing the current virtual file.
  *
@@ -54,10 +64,25 @@ fun File.toVirtualFile(): VirtualFile? =
  * @return The closest [VirtualFile] representing a Gradle project root, or null if none found
  */
 fun VirtualFile.findClosestProject(project: Project): VirtualFile? =
-    ProjectRootManager.getInstance(project).contentRoots
-        .filter { File(it.path, "build.gradle.kts").exists() }
+    findAllProjectRoots(project)
         .sortedBy { it.path.length }
         .reversed()
-        .firstOrNull {
-            path.startsWith(it.path)
+        .firstOrNull { path.startsWith(it.path) }
+
+fun VirtualFile.getBuildFile(): File? {
+    var buildFile = File("$path/build.gradle.kts")
+    if (!buildFile.exists()) {
+        buildFile = File("$path/build.gradle")
+        if (!buildFile.exists()) {
+            return null
         }
+    }
+    return buildFile
+}
+
+fun VirtualFile.getGradlePath(project: Project): String {
+    val rootProject = findAllProjectRoots(project).minByOrNull { it.path.length }
+    return path.substring(rootProject?.path?.length ?: 0).replace("/", ":")
+}
+
+fun File?.exists(): Boolean = this != null && exists()

@@ -12,8 +12,11 @@ import com.simplej.base.EditorPopupMenuItem
 import com.simplej.base.ProjectViewPopupMenuItem
 import com.simplej.base.SimpleJAnAction
 import com.simplej.base.extensions.currentFile
+import com.simplej.base.extensions.exists
 import com.simplej.base.extensions.findClosestProject
+import com.simplej.base.extensions.getBuildFile
 import com.simplej.base.extensions.showError
+import com.simplej.base.extensions.toFile
 import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.io.File
 
@@ -342,15 +345,12 @@ object ConnectedAndroidTestTaskAction : GradleTaskAction("connectedAndroidTest")
 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
         val projectFile = event.currentFile?.findClosestProject(project) ?: return super.shouldShow(event, project)
-        val buildFile = File("${projectFile.path}/build.gradle.kts")
+        val buildFile = projectFile.getBuildFile()
         if (!buildFile.exists()) {
-            File("${projectFile.path}/build.gradle")
-            if (!buildFile.exists()) {
-                return super.shouldShow(event, project)
-            }
+            return super.shouldShow(event, project)
         }
         var isLikelyAndroidProject = false
-        buildFile.useLines { lines ->
+        buildFile!!.useLines { lines ->
             for (line in lines) {
                 if (line.contains(".android.") || line.contains("android {")) {
                     isLikelyAndroidProject = true
