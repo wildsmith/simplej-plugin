@@ -1,6 +1,6 @@
 # Use of this source code is governed by the Apache 2.0 license.
 
 * @wildsmith
-/host/src/main/kotlin/ @normalsmith
-/host/src/main/kotlin/com/simplej/host/actions/github/* @wildsmith
+/plugin/src/main/kotlin/ @normalsmith
+/plugin/src/main/kotlin/com/simplej/plugin/actions/github/* @wildsmith
 /playground/ @normalsmith

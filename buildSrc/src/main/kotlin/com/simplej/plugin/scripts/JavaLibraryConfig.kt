@@ -3,9 +3,24 @@ package com.simplej.plugin.scripts
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.kotlin.dsl.apply
 
+/**
+ * Configures the project as a Java library with Kotlin support.
+ *
+ * This function:
+ * - Applies the 'java-library' and 'kotlin' plugins
+ * - Sets up base project configuration
+ * - Configures Java compilation tasks with appropriate source and target compatibility
+ *
+ * The Java version used for compilation is determined by the `java-lang` value in the version catalog.
+ */
 internal fun Project.configureJavaLibrary() {
-    configureRepositories()
+    apply(plugin = "java-library")
+    apply(plugin = "kotlin")
+
+    configureBaseProject(false)
+
     val javaVersion = "${getJavaVersion()}"
     tasks.withType(JavaCompile::class.java).configureEach {
         sourceCompatibility = javaVersion

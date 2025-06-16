@@ -1,0 +1,134 @@
+<idea-plugin url="https://docs.sonarsource.com/sonarlint/intellij/">
+    <id>com.simplej</id>
+    <name>SimpleJ</name>
+    <version>${project.version}</version>
+    <vendor url="https://github.com/wildsmith/simplej-plugin">Github Project</vendor>
+
+    <description><![CDATA[
+        <html>
+            <p>
+                A simple IntelliJ IDEA Plugin for teaching purposes and performing basic engineering tasks.
+            </p>
+            <p>
+                Clone the project from <a href="https://github.com/wildsmith/simplej-plugin">Github</a> or download SimpleJ from the Plugin Marketplace.
+            </p>
+        </html>
+      ]]>
+    </description>
+
+    <change-notes><![CDATA[
+      <ul>
+        <li>1.0 - Initial distribution with basic Gradle Task interactions and settings</li>
+      </ul>
+      ]]>
+    </change-notes>
+
+    <depends>Git4Idea</depends>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.gradle</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup displayType="STICKY_BALLOON" id="MainNotificationGroup"/>
+    </extensions>
+
+    <actions>
+        <group
+            id="com.simplej.ActionGroup"
+            class="com.simplej.base.SimpleJActionGroup"
+            text="SimpleJ"
+            popup="true">
+            <add-to-group
+                group-id="ProjectViewPopupMenu"
+                anchor="first"/>
+            <add-to-group
+                group-id="EditorPopupMenu"
+                anchor="first"/>
+            <action
+                    id="com.simplej.DeleteModuleAction"
+                    class="com.simplej.plugin.actions.DeleteModuleAction"
+                    icon="AllIcons.General.Delete"
+                    text="Delete Module"/>
+            <separator/>
+            <group
+                id="com.simplej.GradleActionsGroup"
+                class="com.simplej.base.SimpleJActionGroup"
+                text="Run..."
+                popup="true">
+                <action
+                    id="com.simplej.CheckstyleTaskAction"
+                    class="com.simplej.plugin.actions.CheckstyleTaskAction"
+                    icon="AllIcons.FileTypes.Java"
+                    text="Checkstyle"/>
+                <action
+                    id="com.simplej.DetektTaskAction"
+                    class="com.simplej.plugin.actions.DetektTaskAction"
+                    icon="/icons/expui/kotlin.svg"
+                    text="Detekt"/>
+                <action
+                    id="com.simplej.LintTaskAction"
+                    class="com.simplej.plugin.actions.LintTaskAction"
+                    icon="AllIcons.Actions.QuickfixBulb"
+                    text="Lint"/>
+                <action
+                    id="com.simplej.AllStaticCodeAnalysisTaskAction"
+                    class="com.simplej.plugin.actions.AllStaticCodeAnalysisTaskAction"
+                    icon="AllIcons.Nodes.Static"
+                    text="All Static Code Analysis"/>
+                <separator/>
+                <action
+                    id="com.simplej.CheckTaskAction"
+                    class="com.simplej.plugin.actions.CheckTaskAction"
+                    icon="AllIcons.RunConfigurations.Junit"
+                    text="Unit Tests (Check)"/>
+                <action
+                    id="com.simplej.ConnectedAndroidTestTaskAction"
+                    class="com.simplej.plugin.actions.ConnectedAndroidTestTaskAction"
+                    icon="com.simplej.plugin.SimpleJIcons.AndroidDevice"
+                    text="UI Tests (Connected Android Test)"/>
+                <action
+                    id="com.simplej.AllTestTypesTaskAction"
+                    class="com.simplej.plugin.actions.AllTestTypesTaskAction"
+                    icon="AllIcons.Modules.TestResourcesRoot"
+                    text="All Test Types"/>
+                <separator/>
+                <action
+                    id="com.simplej.AssembleTaskAction"
+                    class="com.simplej.plugin.actions.AssembleTaskAction"
+                    icon="AllIcons.Run.Widget.Build"
+                    text="Assemble"/>
+                <action
+                    id="com.simplej.CleanTaskAction"
+                    class="com.simplej.plugin.actions.CleanTaskAction"
+                    icon="AllIcons.Actions.ClearCash"
+                    text="Clean"/>
+            </group>
+            <separator/>
+            <action
+                id="com.simplej.OpenInGithubAction"
+                class="com.simplej.plugin.actions.github.OpenInGithubAction"
+                icon="AllIcons.Vcs.Vendors.Github"
+                text="Open in Github"/>
+            <action
+                id="com.simplej.CopyGithubLinkAction"
+                class="com.simplej.plugin.actions.github.CopyGithubLinkAction"
+                icon="AllIcons.Actions.Copy"
+                text="Copy Github Link"/>
+            <action
+                id="com.simplej.LookupCodeOwnerAction"
+                class="com.simplej.plugin.actions.github.LookupCodeOwnerAction"
+                icon="AllIcons.Actions.Find"
+                text="Lookup Code Owner"/>
+            <separator/>
+            <action
+                id="com.simplej.ValidateWorkspaceAction"
+                class="com.simplej.plugin.actions.ValidateWorkspaceAction"
+                icon="AllIcons.General.GreenCheckmark"
+                text="Validate Workspace"/>
+            <action
+                id="com.simplej.OpenSettingsAction"
+                class="com.simplej.plugin.actions.OpenSettingsAction"
+                icon="AllIcons.General.Settings"
+                text="Settings"/>
+        </group>
+    </actions>
+</idea-plugin>

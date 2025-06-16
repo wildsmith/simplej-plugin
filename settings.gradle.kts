@@ -9,7 +9,7 @@ pluginManagement {
 rootProject.name = "simplej-plugin"
 
 include(
-    ":core",
-    ":host",
+    ":base",
+    ":plugin",
     ":playground"
 )

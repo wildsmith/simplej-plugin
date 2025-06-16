@@ -10,8 +10,25 @@ import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.repositories
 
+/**
+ * Configures the project as an IntelliJ Platform plugin.
+ *
+ * This function performs plugin configuration only if either the 'org.jetbrains.intellij.platform'
+ * or 'org.jetbrains.intellij.platform.module' plugin is applied. The configuration includes:
+ *
+ * - Setting up IntelliJ Platform repositories
+ * - Configuring plugin dependencies:
+ *   - Bundled plugins (Gradle, Java, Git4Idea)
+ *   - IntelliJ IDEA Community Edition
+ * - Configuring plugin metadata (when using org.jetbrains.intellij.platform):
+ *   - Compatible IDE versions (sinceBuild, untilBuild)
+ *   - Disabling searchable options build
+ *   - Distribution tasks setup
+ */
 internal fun Project.configureIntelliJPlugin() {
-    if (!plugins.hasPlugin("org.jetbrains.intellij.platform") && !plugins.hasPlugin("org.jetbrains.intellij.platform.module")) {
+    val hasPlatformPlugin = plugins.hasPlugin("org.jetbrains.intellij.platform")
+    val hasPlatformModulePlugin = plugins.hasPlugin("org.jetbrains.intellij.platform.module")
+    if (!hasPlatformPlugin && !hasPlatformModulePlugin) {
         return
     }
 
@@ -28,7 +45,7 @@ internal fun Project.configureIntelliJPlugin() {
         }
     }
 
-    if (plugins.hasPlugin("org.jetbrains.intellij.platform")) {
+    if (hasPlatformPlugin) {
         intellijPlatform {
             pluginConfiguration {
                 ideaVersion {
@@ -39,7 +56,6 @@ internal fun Project.configureIntelliJPlugin() {
             buildSearchableOptions.set(false)
         }
         configureDistTasks()
-//        configureUberJar()
     }
 }
 
@@ -101,24 +117,3 @@ private fun Project.configureDistTasks() {
         into(distDir)
     }
 }
-
-//private fun Project.configureUberJar() {
-//    tasks.named("jar", Jar::class.java).configure {
-//        from(sourceSets.named("main").get().output)
-//        dependsOn(configurations.named("runtimeClasspath"))
-//        from({
-//            configurations.named("runtimeClasspath").get().filter {
-//                it.path.contains(project.projectDir.parentFile.path) && it.name.endsWith("jar")
-//            }.map {
-//                zipTree(it)
-//            }
-//        })
-//        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//    }
-//
-//    tasks.named("instrumentedJar").configure {
-//        project.siblings.filter { !it.path.endsWith("playground") }.forEach { sibling ->
-//            dependsOn("${sibling.path}:jar")
-//        }
-//    }
-//}

@@ -18,53 +18,148 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.tasks.SourceSetContainer
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 
+/**
+ * Extension property to access the source sets configuration of a Gradle project.
+ *
+ * @return The [SourceSetContainer] for this project
+ */
 internal val Project.sourceSets: SourceSetContainer
     get() = extensions["sourceSets"] as SourceSetContainer
 
+/**
+ * Extension property to get all sibling projects at the same level as the current one.
+ *
+ * @return A [Set] of sibling [Project]s, or empty set if this project has no siblings
+ */
 internal val Project.siblings: Set<Project>
     get() = parent?.subprojects?.filterTo(mutableSetOf()) { it != this } ?: setOf()
 
 private fun Project.getVersionCatalog(): VersionCatalog =
     extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
 
-internal fun Project.getSimpleJavaVersion() =
+/**
+ * Gets the Java version string from the version catalog.
+ *
+ * @return The Java version as a string from 'java-lang' entry in version catalog
+ *
+ * @see getVersionCatalog
+ */
+internal fun Project.getSimpleJavaVersion(): String =
     getVersionCatalog().findVersion("java-lang").get().requiredVersion
 
+/**
+ * Gets the Java version as [JavaVersion] object from the version catalog.
+ *
+ * @return [JavaVersion] object corresponding to the project's Java version
+ *
+ * @see getVersionCatalog
+ */
 internal fun Project.getJavaVersion(): JavaVersion =
     JavaVersion.toVersion(getSimpleJavaVersion())
 
-internal fun Project.getAndroidVersion() =
+/**
+ * Gets the Android target version from the version catalog.
+ *
+ * @return The Android target version as a string
+ *
+ * @see getVersionCatalog
+ */
+internal fun Project.getAndroidVersion(): String =
     getVersionCatalog().findVersion("android-target").get().requiredVersion
 
-internal fun Project.getIntelliJReleaseVersion() =
+/**
+ * Gets the IntelliJ IDEA release version from the version catalog.
+ *
+ * @return The IntelliJ IDEA release version as a string
+ *
+ * @see getVersionCatalog
+ */
+internal fun Project.getIntelliJReleaseVersion(): String =
     getVersionCatalog().findVersion("intellij-release").get().requiredVersion
 
-internal fun Project.getIntelliJSinceBuildVersion() =
+/**
+ * Gets the minimum compatible IntelliJ IDEA build version from the version catalog.
+ *
+ * @return The minimum IntelliJ IDEA build version as a string
+ *
+ * @see getVersionCatalog
+ */
+internal fun Project.getIntelliJSinceBuildVersion(): String =
     getVersionCatalog().findVersion("intellij-since-build").get().requiredVersion
 
-internal fun Project.getIntelliJUntilBuildVersion() =
+/**
+ * Gets the maximum compatible IntelliJ IDEA build version from the version catalog.
+ *
+ * @return The maximum IntelliJ IDEA build version as a string
+ *
+ * @see getVersionCatalog
+ */
+internal fun Project.getIntelliJUntilBuildVersion(): String =
     getVersionCatalog().findVersion("intellij-until-build").get().requiredVersion
 
-internal fun Project.getDetektGradleVersion() =
+/**
+ * Gets the Detekt Gradle plugin version from the version catalog.
+ *
+ * @return The Detekt Gradle plugin version as a string
+ *
+ * @see getVersionCatalog
+ */
+internal fun Project.getDetektGradleVersion(): String =
     getVersionCatalog().findVersion("detekt-gradle-plugin").get().requiredVersion
 
+/**
+ * Configures Android-specific settings for the project. This extension function leverages the most basic extension
+ * type leveraged by Android library, test, and application projects.
+ *
+ * @param configuration Lambda with Android configuration block
+ */
 internal fun Project.android(configuration: BaseExtension.() -> Unit) =
     extensions.configure(BaseExtension::class.java, configuration)
 
+/**
+ * Configures Android library-specific settings for the project.
+ *
+ * @param configuration Lambda with Android library configuration block
+ */
 internal fun Project.androidLibrary(configuration: LibraryExtension.() -> Unit) =
     extensions.configure(LibraryExtension::class.java, configuration)
 
+/**
+ * Configures Android lint options for the project.
+ *
+ * @param configuration Lambda with lint configuration block
+ */
 internal fun Project.lint(configuration: LintOptions.() -> Unit) =
     extensions.configure(LintOptions::class.java, configuration)
 
+/**
+ * Configures IntelliJ Platform-specific repository settings.
+ *
+ * @param configuration Lambda with IntelliJ Platform repositories configuration block
+ */
 internal fun RepositoryHandler.intellijPlatform(configuration: IntelliJPlatformRepositoriesExtension.() -> Unit) =
     configuration((this as ExtensionAware).extensions["intellijPlatform"] as IntelliJPlatformRepositoriesExtension)
 
+/**
+ * Configures IntelliJ Platform-specific dependency settings.
+ *
+ * @param configuration Lambda with IntelliJ Platform dependencies configuration block
+ */
 internal fun DependencyHandlerScope.intellijPlatform(configuration: IntelliJPlatformDependenciesExtension.() -> Unit) =
     configuration(extensions["intellijPlatform"] as IntelliJPlatformDependenciesExtension)
 
+/**
+ * Configures IntelliJ Platform-specific settings for the project.
+ *
+ * @param configuration Lambda with IntelliJ Platform configuration block
+ */
 internal fun Project.intellijPlatform(configuration: IntelliJPlatformExtension.() -> Unit) =
     configuration(extensions["intellijPlatform"] as IntelliJPlatformExtension)
 
+/**
+ * Configures Detekt static code analysis settings for the project.
+ *
+ * @param configuration Lambda with Detekt configuration block
+ */
 internal fun Project.detekt(configuration: DetektExtension.() -> Unit) =
     extensions.configure(DetektExtension::class.java, configuration)
