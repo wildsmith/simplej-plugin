@@ -1,5 +1,1 @@
-plugins {
-    id("simplej.java-library")
-}
-
-simpleJ.intellijPlugin = true
+plugins { `java-library` }
