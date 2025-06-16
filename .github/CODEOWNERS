@@ -1,7 +1,8 @@
 # Use of this source code is governed by the Apache 2.0 license.
 
 * @wildsmith
+/demo-modules/delete-me-no-references/ @normalsmith
+/demo-modules/delete-me-with-references/ @wildsmith
+/playground/ @normalsmith
 /plugin/src/main/kotlin/ @normalsmith
 /plugin/src/main/kotlin/com/simplej/plugin/actions/github/* @wildsmith
-/playground/ @normalsmith
-/delete-me-no-references/ @normalsmith
