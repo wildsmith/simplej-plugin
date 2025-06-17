@@ -1,5 +1,5 @@
 // Use of this source code is governed by the Apache 2.0 license.
-package com.simplej.plugin.actions
+package com.simplej.plugin.actions.settings
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.simplej.base.EditorPopupMenuItem

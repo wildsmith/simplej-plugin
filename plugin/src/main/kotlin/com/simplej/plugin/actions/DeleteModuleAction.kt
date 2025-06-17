@@ -10,13 +10,14 @@ import com.simplej.base.SimpleJAnAction
 import com.simplej.base.extensions.currentFile
 import com.simplej.base.extensions.findAllProjectRoots
 import com.simplej.base.extensions.findClosestProject
-import com.simplej.base.extensions.getRootProjectFile
 import com.simplej.base.extensions.getBuildFile
 import com.simplej.base.extensions.getCodeOwnersFile
 import com.simplej.base.extensions.getGradlePath
+import com.simplej.base.extensions.getRootProjectFile
 import com.simplej.base.extensions.getSettingsFile
 import com.simplej.base.extensions.gradleSync
 import com.simplej.base.extensions.showError
+import com.simplej.base.extensions.toVirtualFile
 import com.simplej.plugin.actions.github.LookupCodeOwnerAction.CodeOwnerIdentifier
 import org.jetbrains.annotations.VisibleForTesting
 
@@ -65,22 +66,28 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
             "No valid project found within the workspace."
         )
 
-        if (checkForBuildFileReferences(projectFile, project)) {
-            promptWithReferenceDialog()
+        val references = checkForBuildFileReferences(projectFile, project)
+        if (references.isNotEmpty()) {
+            DeletionWarningDialog(project, references) {
+                deleteModuleAndSync(projectFile, project, event)
+            }.show()
         } else {
             deleteModuleAndSync(projectFile, project, event)
         }
     }
 
     @VisibleForTesting
-    internal fun checkForBuildFileReferences(projectFile: VirtualFile, project: Project): Boolean {
+    internal fun checkForBuildFileReferences(projectFile: VirtualFile, project: Project): Set<CodeReference> {
         val shorthandProjectPath = projectFile.getGradlePath(project)
         val projectRoots = projectFile.findAllProjectRoots(project)
-        var containsReferences = false
+        val references = mutableSetOf<CodeReference>()
         for (projectRoot in projectRoots) {
             var withinDependenciesBlock = false
-            projectRoot.getBuildFile()?.useLines { lines ->
+            val buildFile = projectRoot.getBuildFile()
+            buildFile?.useLines { lines ->
+                var lineNumber = 0
                 for (line in lines) {
+                    lineNumber++
                     if (line.contains("dependencies {")) {
                         withinDependenciesBlock = true
                     }
@@ -91,7 +98,13 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
                                 .substringBefore("'")
                                 .substringBefore("\"")
                             if (dependency == shorthandProjectPath) {
-                                containsReferences = true
+                                references.add(
+                                    CodeReference(
+                                        projectRoot.getGradlePath(project),
+                                        buildFile.toVirtualFile()!!,
+                                        lineNumber
+                                    )
+                                )
                                 break
                             }
                         }
@@ -99,12 +112,7 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
                 }
             }
         }
-        return containsReferences
-    }
-
-    @VisibleForTesting
-    internal fun promptWithReferenceDialog() {
-        TODO("Not yet implemented")
+        return references
     }
 
     @VisibleForTesting
@@ -120,7 +128,7 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
                 fileWrites
                     .filterNotNull()
                     .forEach { it() }
-                projectFile.delete(this)
+                projectFile.delete(DeleteModuleAction::class.java)
                 event.gradleSync()
             }
         )
@@ -188,6 +196,15 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
                 codeOwnerFile.writeText(lines.joinToString("\n"))
             }
         }
+    }
+
+    internal data class CodeReference(
+        val modulePath: String,
+        val buildFile: VirtualFile,
+        val lineNumber: Int
+    ) {
+        override fun toString(): String =
+            "$modulePath (${buildFile.name}:$lineNumber)"
     }
 }
 

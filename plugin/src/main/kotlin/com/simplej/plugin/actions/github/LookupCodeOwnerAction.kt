@@ -61,9 +61,9 @@ internal class LookupCodeOwnerAction : GithubTrackedCodeAction() {
             .findCodeOwnerRule(currentFile.path.substringAfter(project.name))
             ?: return event.showError("Unable to find code owner rule for file: ${currentFile.path}")
 
-        val message = "Code Owners: ${codeOwnerRule.owners.joinToString(", ")}"
+        val codeOwners = codeOwnerRule.owners.joinToString(", ")
         project.showNotification(
-            message = message,
+            message = "Code Owners: $codeOwners",
             actions = mutableSetOf<AnAction>().apply {
                 add(
                     NotificationAction.createSimpleExpiring("CODEOWNERS") {
@@ -73,7 +73,7 @@ internal class LookupCodeOwnerAction : GithubTrackedCodeAction() {
                 add(
                     NotificationAction.createSimpleExpiring("Copy") {
                         val copyPasteManager = CopyPasteManager.getInstance()
-                        copyPasteManager.setContents(StringSelection(message))
+                        copyPasteManager.setContents(StringSelection(codeOwners))
                     }
                 )
             }

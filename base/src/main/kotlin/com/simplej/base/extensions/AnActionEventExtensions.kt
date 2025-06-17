@@ -2,13 +2,10 @@
 package com.simplej.base.extensions
 
 import androidx.annotation.RestrictTo
-import com.intellij.ide.actions.OpenFileAction
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.fileEditor.FileEditorManager
 import java.io.File
 
 /**
@@ -51,19 +48,8 @@ fun AnActionEvent.showNotification(
  *             If null, the caret position remains unchanged
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-fun AnActionEvent.openInIde(file: File, line: Int? = null) {
-    val virtualFile = file.toVirtualFile() ?: return
-    val project = project ?: return
-    OpenFileAction.openFile(virtualFile, project)
-
-    if (line != null) {
-        FileEditorManager
-            .getInstance(project)
-            .selectedTextEditor
-            ?.caretModel
-            ?.moveToLogicalPosition(LogicalPosition(line - 1, 0))
-    }
-}
+fun AnActionEvent.openInIde(file: File, line: Int? = null) =
+    project.openInIde(file, line)
 
 /**
  * Synchronizes the Gradle project in the IDE.

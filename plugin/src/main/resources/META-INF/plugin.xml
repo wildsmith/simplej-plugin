@@ -126,7 +126,7 @@
                 text="Validate Workspace"/>
             <action
                 id="com.simplej.OpenSettingsAction"
-                class="com.simplej.plugin.actions.OpenSettingsAction"
+                class="com.simplej.plugin.actions.settings.OpenSettingsAction"
                 icon="AllIcons.General.Settings"
                 text="Settings"/>
         </group>
