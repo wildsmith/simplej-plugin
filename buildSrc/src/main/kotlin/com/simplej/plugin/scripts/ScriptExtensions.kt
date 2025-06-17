@@ -34,7 +34,7 @@ internal val Project.sourceSets: SourceSetContainer
 internal val Project.siblings: Set<Project>
     get() = parent?.subprojects?.filterTo(mutableSetOf()) { it != this } ?: setOf()
 
-private fun Project.getVersionCatalog(): VersionCatalog =
+internal fun Project.getVersionCatalog(): VersionCatalog =
     extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
 
 /**
@@ -44,8 +44,7 @@ private fun Project.getVersionCatalog(): VersionCatalog =
  *
  * @see getVersionCatalog
  */
-internal fun Project.getSimpleJavaVersion(): String =
-    getVersionCatalog().findVersion("java-lang").get().requiredVersion
+internal fun Project.getSimpleJavaVersion(): String = getVersionCatalog().findVersion("java-lang").get().requiredVersion
 
 /**
  * Gets the Java version as [JavaVersion] object from the version catalog.
@@ -54,8 +53,7 @@ internal fun Project.getSimpleJavaVersion(): String =
  *
  * @see getVersionCatalog
  */
-internal fun Project.getJavaVersion(): JavaVersion =
-    JavaVersion.toVersion(getSimpleJavaVersion())
+internal fun Project.getJavaVersion(): JavaVersion = JavaVersion.toVersion(getSimpleJavaVersion())
 
 /**
  * Gets the Android target version from the version catalog.
@@ -163,3 +161,24 @@ internal fun Project.intellijPlatform(configuration: IntelliJPlatformExtension.(
  */
 internal fun Project.detekt(configuration: DetektExtension.() -> Unit) =
     extensions.configure(DetektExtension::class.java, configuration)
+
+/**
+ * Adds a dependency to the 'testImplementation' configuration.
+ *
+ * This function is a convenience wrapper around the Gradle dependency handler's add method, specifically for test
+ * dependencies. It is used to declare dependencies that are only required for testing the project, such as testing
+ * frameworks and mocking libraries.
+ *
+ * Example usage:
+ * ```
+ * dependencies {
+ *     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+ *     testImplementation("io.mockk:mockk:1.12.0")
+ * }
+ * ```
+ *
+ * @param dependencyNotation The dependency to add, can be a String (e.g. "group:name:version"),
+ *                          a Project instance, a File instance, or any other valid Gradle dependency notation
+ */
+internal fun DependencyHandlerScope.testImplementation(dependencyNotation: Any) =
+    add("testImplementation", dependencyNotation)

@@ -5,7 +5,9 @@ import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.Project
 import org.gradle.api.plugins.quality.Checkstyle
 import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.repositories
 
 /**
@@ -28,6 +30,7 @@ internal fun Project.configureBaseProject(isAndroidLibrary: Boolean) {
     configureCheckstyle()
     configureLint(isAndroidLibrary)
     configureDetekt()
+    configureTests()
 }
 
 private fun Project.configureCheckstyle() {
@@ -84,5 +87,20 @@ private fun Project.configureDetekt() {
         reports {
             html.required.set(true)
         }
+    }
+}
+
+private fun Project.configureTests() {
+    tasks.withType(Test::class.java).configureEach {
+        maxParallelForks = Runtime.getRuntime().availableProcessors()
+        useJUnitPlatform()
+    }
+
+    dependencies {
+        val versionCatalog = getVersionCatalog()
+        testImplementation(versionCatalog.findLibrary("mockk").get())
+        testImplementation(versionCatalog.findLibrary("jupiter-api").get())
+        testImplementation(versionCatalog.findLibrary("jupiter-engine").get())
+        testImplementation(versionCatalog.findLibrary("kotlin-test").get())
     }
 }
