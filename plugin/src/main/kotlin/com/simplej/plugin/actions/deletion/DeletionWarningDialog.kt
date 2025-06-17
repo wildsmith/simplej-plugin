@@ -1,12 +1,11 @@
 // Use of this source code is governed by the Apache 2.0 license.
-package com.simplej.plugin.actions
+package com.simplej.plugin.actions.deletion
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.dsl.builder.panel
 import com.simplej.base.extensions.openInIde
-import com.simplej.plugin.actions.DeleteModuleAction.CodeReference
 
 /**
  * A dialog that warns users about existing references to a module before deletion. This dialog displays a list of
@@ -17,7 +16,7 @@ import com.simplej.plugin.actions.DeleteModuleAction.CodeReference
  */
 internal class DeletionWarningDialog(
     private val project: Project,
-    private val codeReferences: Set<CodeReference>,
+    private val codeReferences: Set<DeleteModuleAction.CodeReference>,
     private val okCallback: () -> Unit,
 ) : DialogWrapper(project, true) {
 

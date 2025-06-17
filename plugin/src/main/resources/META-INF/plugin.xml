@@ -29,6 +29,12 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup displayType="STICKY_BALLOON" id="MainNotificationGroup"/>
+        <applicationService serviceImplementation="com.simplej.plugin.actions.settings.SimpleJSettings"/>
+        <applicationConfigurable
+            parentId="tools"
+            instance="com.simplej.plugin.actions.settings.SimpleJSettingsConfigurable"
+            id="com.simplej.plugin.actions.settings.SimpleJSettingsConfigurable"
+            displayName="SimpleJ"/>
     </extensions>
 
     <actions>
@@ -45,7 +51,7 @@
                 anchor="first"/>
             <action
                     id="com.simplej.DeleteModuleAction"
-                    class="com.simplej.plugin.actions.DeleteModuleAction"
+                    class="com.simplej.plugin.actions.deletion.DeleteModuleAction"
                     icon="AllIcons.General.Delete"
                     text="Delete Module"/>
             <separator/>
@@ -80,6 +86,11 @@
                     class="com.simplej.plugin.actions.CheckTaskAction"
                     icon="AllIcons.RunConfigurations.Junit"
                     text="Unit Tests (Check)"/>
+                <action
+                    id="com.simplej.BuildTaskAction"
+                    class="com.simplej.plugin.actions.BuildTaskAction"
+                    icon="AllIcons.RunConfigurations.Junit"
+                    text="Unit Tests (Build)"/>
                 <action
                     id="com.simplej.ConnectedAndroidTestTaskAction"
                     class="com.simplej.plugin.actions.ConnectedAndroidTestTaskAction"

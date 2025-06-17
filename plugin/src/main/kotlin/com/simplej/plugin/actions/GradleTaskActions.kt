@@ -16,6 +16,7 @@ import com.simplej.base.extensions.exists
 import com.simplej.base.extensions.findClosestProject
 import com.simplej.base.extensions.getBuildFile
 import com.simplej.base.extensions.showError
+import com.simplej.plugin.actions.settings.SimpleJSettings
 import org.jetbrains.annotations.VisibleForTesting
 import org.jetbrains.plugins.gradle.util.GradleConstants
 
@@ -64,6 +65,27 @@ internal abstract class GradleTaskAction private constructor(
      * @param tasks Variable number of GradleTaskActions whose tasks should be combined
      */
     constructor(vararg tasks: GradleTaskAction) : this(null, tasks.toSet())
+
+    /**
+     * Determines whether the action should be visible in the current context based on custom logic.
+     *
+     * This method checks if there is exactly one task from the provided event and project.
+     * If there is a single task, it verifies if the task matches an enabled task in the Plugin's Settings
+     *
+     * @param event The action event containing context information.
+     * @param project The current IntelliJ IDEA project in which the action is invoked.
+     * @return `true` if the action should be visible, `false` otherwise.
+     */
+    override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
+        val tasks = getTasks(event, project)
+        return if (tasks.size == 1) {
+            val taskName = tasks.first()
+            SimpleJSettings.instance.state.defaultTasks.find { it.name == taskName }?.enabled
+                ?: super.shouldShow(event, project)
+        } else {
+            super.shouldShow(event, project)
+        }
+    }
 
     @Suppress("ReturnCount")
     override fun actionPerformed(event: AnActionEvent) {
@@ -165,7 +187,7 @@ internal object DetektTaskAction : GradleTaskAction("detekt")
 /**
  * Action to run Checkstyle code analysis via Gradle.
  *
- * This singleton action executes the 'checkstyleMain' Gradle task which performs static code analysis on Java source
+ * This singleton action executes the 'checkstyle' Gradle task which performs static code analysis on Java source
  * files using Checkstyle. The task validates code against a defined set of coding standards and style rules
  * specified in the project's Checkstyle configuration.
  *
@@ -180,7 +202,7 @@ internal object DetektTaskAction : GradleTaskAction("detekt")
  * @see GradleTaskAction
  * @see <a href="https://checkstyle.sourceforge.io/">Checkstyle Documentation</a>
  */
-internal object CheckstyleTaskAction : GradleTaskAction("checkstyleMain")
+internal object CheckstyleTaskAction : GradleTaskAction("checkstyle")
 
 /**
  * Action to run Android Lint analysis via Gradle.

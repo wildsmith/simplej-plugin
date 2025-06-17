@@ -1,5 +1,5 @@
 // Use of this source code is governed by the Apache 2.0 license.
-package com.simplej.plugin.actions
+package com.simplej.plugin.actions.deletion
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.command.WriteCommandAction
