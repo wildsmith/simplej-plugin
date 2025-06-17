@@ -3,6 +3,8 @@ package com.simplej.plugins.actions
 
 import com.intellij.execution.executors.DefaultRunExecutor
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.application.Application
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.externalSystem.model.execution.ExternalSystemTaskExecutionSettings
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.project.Project
@@ -13,6 +15,7 @@ import com.simplej.base.extensions.findClosestProject
 import com.simplej.base.extensions.showError
 import com.simplej.base.extensions.showNotification
 import com.simplej.plugin.actions.GradleTaskAction
+import com.simplej.plugin.actions.settings.SimpleJSettings
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -32,6 +35,7 @@ internal class GradleTaskActionsTests {
     private lateinit var currentFile: VirtualFile
     private lateinit var projectFile: VirtualFile
     private lateinit var projectRootManager: ProjectRootManager
+    private lateinit var application: Application
 
     @BeforeEach
     fun setUp() {
@@ -40,6 +44,7 @@ internal class GradleTaskActionsTests {
         currentFile = mockk(relaxed = true)
         projectFile = mockk(relaxed = true)
         projectRootManager = mockk(relaxed = true)
+        application = mockk(relaxed = true)
 
         mockkStatic(ProjectRootManager::class)
         every { ProjectRootManager.getInstance(eq(project)) } returns projectRootManager
@@ -50,6 +55,11 @@ internal class GradleTaskActionsTests {
 
         mockkStatic("com.simplej.base.extensions.AnActionEventExtensionsKt")
         every { event.showError(any()) } just Runs
+
+        mockkStatic(ApplicationManager::class)
+        every { ApplicationManager.getApplication() } returns application
+        every { application.getService(eq(SimpleJSettings::class.java)) } returns
+                mockk<SimpleJSettings>(relaxed = true)
 
         every { event.project } returns project
         every { event.currentFile } returns currentFile

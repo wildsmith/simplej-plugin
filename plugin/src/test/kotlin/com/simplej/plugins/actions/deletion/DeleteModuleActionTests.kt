@@ -1,5 +1,5 @@
 // Use of this source code is governed by the Apache 2.0 license.
-package com.simplej.plugins.actions
+package com.simplej.plugins.actions.deletion
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -14,7 +14,7 @@ import com.simplej.base.extensions.getGradlePath
 import com.simplej.base.extensions.getRootProjectFile
 import com.simplej.base.extensions.getSettingsFile
 import com.simplej.base.extensions.gradleSync
-import com.simplej.plugin.actions.DeleteModuleAction
+import com.simplej.plugin.actions.deletion.DeleteModuleAction
 import com.simplej.plugin.actions.github.LookupCodeOwnerAction.CodeOwnerIdentifier
 import io.mockk.Runs
 import io.mockk.every
@@ -117,7 +117,7 @@ internal class DeleteModuleActionTests {
             true
         }
 
-        assertTrue(action.checkForBuildFileReferences(projectFile, project))
+        assertFalse(action.checkForBuildFileReferences(projectFile, project).isEmpty())
     }
 
     @Disabled("Until I can figure out how to mock `useLines`")
