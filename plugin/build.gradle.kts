@@ -5,7 +5,13 @@ plugins {
     id("org.jetbrains.intellij.platform")
 }
 
-simpleJ.intellijPlugin = true
+simpleJ {
+    intellijPlugin = true
+    unitTestCoverageMinimums {
+        instruction = 58
+        branch = 49
+    }
+}
 
 dependencies {
     implementation(libs.compose.runtime)

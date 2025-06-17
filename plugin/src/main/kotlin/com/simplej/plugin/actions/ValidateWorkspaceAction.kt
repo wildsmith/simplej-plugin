@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.simplej.base.ProjectViewPopupMenuItem
 import com.simplej.base.SimpleJAnAction
 
-class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
+internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
 
     override fun actionPerformed(event: AnActionEvent) {
         TODO("Not yet implemented")

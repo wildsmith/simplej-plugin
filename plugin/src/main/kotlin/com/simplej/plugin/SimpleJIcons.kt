@@ -13,7 +13,7 @@ import javax.swing.Icon
  * files.
  */
 @Suppress("unused")
-object SimpleJIcons {
+internal object SimpleJIcons {
 
     /**
      * Icon representing an Android device. Used in UI elements related to Android device operations. The icon is

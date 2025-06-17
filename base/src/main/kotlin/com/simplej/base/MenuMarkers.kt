@@ -1,6 +1,8 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.base
 
+import androidx.annotation.RestrictTo
+
 /**
  * Marker interface for actions that should appear in the editor popup menu.
  *
@@ -9,6 +11,7 @@ package com.simplej.base
  *
  * This interface is typically used in conjunction with [com.intellij.openapi.actionSystem.AnAction].
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 interface EditorPopupMenuItem
 
 /**
@@ -19,4 +22,5 @@ interface EditorPopupMenuItem
  *
  * This interface is typically used in conjunction with [com.intellij.openapi.actionSystem.AnAction].
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 interface ProjectViewPopupMenuItem

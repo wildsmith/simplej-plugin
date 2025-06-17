@@ -49,7 +49,7 @@ import java.awt.datatransfer.StringSelection
  *
  * @see GithubTrackedCodeAction
  */
-class CopyGithubLinkAction : GithubTrackedCodeAction() {
+internal class CopyGithubLinkAction : GithubTrackedCodeAction() {
 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
         return event.currentFiles.size == 1

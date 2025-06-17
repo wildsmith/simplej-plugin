@@ -18,6 +18,7 @@ import com.simplej.base.extensions.getSettingsFile
 import com.simplej.base.extensions.gradleSync
 import com.simplej.base.extensions.showError
 import com.simplej.plugin.actions.github.LookupCodeOwnerAction.CodeOwnerIdentifier
+import org.jetbrains.annotations.VisibleForTesting
 
 /**
  * Action that handles the deletion of modules from a Gradle project.
@@ -29,7 +30,7 @@ import com.simplej.plugin.actions.github.LookupCodeOwnerAction.CodeOwnerIdentifi
  * - Removes the module directory
  * - Triggers a Gradle sync
  */
-class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
+internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
 
     /**
      * Determines whether the action should be shown in the context menu.
@@ -71,7 +72,8 @@ class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         }
     }
 
-    private fun checkForBuildFileReferences(projectFile: VirtualFile, project: Project): Boolean {
+    @VisibleForTesting
+    internal fun checkForBuildFileReferences(projectFile: VirtualFile, project: Project): Boolean {
         val shorthandProjectPath = projectFile.getGradlePath(project)
         val projectRoots = projectFile.findAllProjectRoots(project)
         var containsReferences = false
@@ -100,11 +102,13 @@ class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         return containsReferences
     }
 
-    private fun promptWithReferenceDialog() {
+    @VisibleForTesting
+    internal fun promptWithReferenceDialog() {
         TODO("Not yet implemented")
     }
 
-    private fun deleteModuleAndSync(projectFile: VirtualFile, project: Project, event: AnActionEvent) {
+    @VisibleForTesting
+    internal fun deleteModuleAndSync(projectFile: VirtualFile, project: Project, event: AnActionEvent) {
         val fileWrites = mutableListOf<FileUpdates?>()
         fileWrites.add(updateSettings(projectFile, project))
         fileWrites.add(updateCodeOwners(projectFile, project))
@@ -122,7 +126,8 @@ class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         )
     }
 
-    private fun updateSettings(
+    @VisibleForTesting
+    internal fun updateSettings(
         projectFile: VirtualFile,
         project: Project
     ): (() -> Unit)? {
@@ -156,7 +161,8 @@ class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         return { settingsFile.writeText(fileLines.toString()) }
     }
 
-    private fun updateCodeOwners(currentFile: VirtualFile, project: Project): (() -> Unit)? {
+    @VisibleForTesting
+    internal fun updateCodeOwners(currentFile: VirtualFile, project: Project): (() -> Unit)? {
         val rootProjectFile = currentFile.getRootProjectFile(project) ?: return null
         val currentFilePathSegments = currentFile.path.substringAfter(rootProjectFile.path)
             .split("/")

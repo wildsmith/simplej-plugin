@@ -11,6 +11,7 @@ intellij-gradle-plugin = "2.6.0"
 detekt-gradle-plugin = "1.23.8"
 mockk = "1.13.8"
 junit-jupiter = "5.10.1"
+androidx-annotation = "1.9.1"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
@@ -22,6 +23,7 @@ mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-lang" }
+androidx-annotations = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 
 [plugins]
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }

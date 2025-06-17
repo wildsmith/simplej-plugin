@@ -1,6 +1,7 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.base
 
+import androidx.annotation.RestrictTo
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -16,6 +17,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
  * behavior and optimal performance.
  */
 @Suppress("ComponentNotRegistered")
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 class SimpleJActionGroup : DefaultActionGroup() {
 
     /**

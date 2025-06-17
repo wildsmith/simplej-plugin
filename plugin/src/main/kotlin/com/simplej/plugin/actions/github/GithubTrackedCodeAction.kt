@@ -12,13 +12,14 @@ import com.simplej.base.ProjectViewPopupMenuItem
 import com.simplej.base.SimpleJAnAction
 import com.simplej.base.extensions.currentFiles
 import git4idea.GitUtil
+import org.jetbrains.annotations.VisibleForTesting
 
 /**
  * An abstract base class for GitHub-specific actions that integrate with GitHub functionality.
  *
  * This class provides specialized functionality for actions that interact with GitHub repositories and features.
  */
-abstract class GithubTrackedCodeAction : SimpleJAnAction(), ProjectViewPopupMenuItem, EditorPopupMenuItem {
+internal abstract class GithubTrackedCodeAction : SimpleJAnAction(), ProjectViewPopupMenuItem, EditorPopupMenuItem {
 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean =
         event.currentFiles.ifEmpty {
@@ -26,36 +27,37 @@ abstract class GithubTrackedCodeAction : SimpleJAnAction(), ProjectViewPopupMenu
         }.any {
             FileStatusManager.getInstance(project).getStatus(it) != FileStatus.IGNORED
         }
+}
 
-    protected fun Project.getGithubUrl(
-        editor: Editor?,
-        projectFile: VirtualFile,
-        currentFile: VirtualFile
-    ): String? {
-        var linePath = ""
-        editor?.let {
-            val selectionModel = it.selectionModel
-            val document = editor.document
-            val startLine = document.getLineNumber(selectionModel.selectionStart) + 1
-            val endLine = document.getLineNumber(selectionModel.selectionEnd) + 1
+@VisibleForTesting
+internal fun Project.getGithubUrl(
+    editor: Editor?,
+    projectFile: VirtualFile,
+    currentFile: VirtualFile
+): String? {
+    var linePath = ""
+    editor?.let {
+        val selectionModel = it.selectionModel
+        val document = editor.document
+        val startLine = document.getLineNumber(selectionModel.selectionStart) + 1
+        val endLine = document.getLineNumber(selectionModel.selectionEnd) + 1
 
-            linePath = if (endLine > startLine) {
-                "#L$startLine-L$endLine"
-            } else {
-                "#L$startLine"
-            }
-        }
-        val remoteUrl = GitUtil.getRepositoryForFile(this, projectFile)
-            .remotes
-            .firstOrNull { it.name == "origin" }
-            ?.firstUrl
-            ?.substringBefore(".git")
-        return if (remoteUrl != null) {
-            val lastSegment = remoteUrl.substringAfterLast("/")
-            val pathSegment = currentFile.path.substringAfterLast(lastSegment)
-            "$remoteUrl/blob/main$pathSegment$linePath"
+        linePath = if (endLine > startLine) {
+            "#L$startLine-L$endLine"
         } else {
-            null
+            "#L$startLine"
         }
+    }
+    val remoteUrl = GitUtil.getRepositoryForFile(this, projectFile)
+        .remotes
+        .firstOrNull { it.name == "origin" }
+        ?.firstUrl
+        ?.substringBefore(".git")
+    return if (remoteUrl != null) {
+        val lastSegment = remoteUrl.substringAfterLast("/")
+        val pathSegment = currentFile.path.substringAfterLast(lastSegment)
+        "$remoteUrl/blob/main$pathSegment$linePath"
+    } else {
+        null
     }
 }

@@ -16,6 +16,7 @@ import com.simplej.base.extensions.exists
 import com.simplej.base.extensions.findClosestProject
 import com.simplej.base.extensions.getBuildFile
 import com.simplej.base.extensions.showError
+import org.jetbrains.annotations.VisibleForTesting
 import org.jetbrains.plugins.gradle.util.GradleConstants
 
 /**
@@ -40,9 +41,11 @@ import org.jetbrains.plugins.gradle.util.GradleConstants
  * @constructor Creates a new GradleTaskAction with the specified tasks
  * @param tasks Variable number of task names to execute
  */
-abstract class GradleTaskAction private constructor(
-    private val tasks: Set<String>?,
-    private val complexTasks: Set<GradleTaskAction>?
+internal abstract class GradleTaskAction private constructor(
+    @VisibleForTesting
+    internal val tasks: Set<String>?,
+    @VisibleForTesting
+    internal val complexTasks: Set<GradleTaskAction>?
 ) : SimpleJAnAction(), ProjectViewPopupMenuItem, EditorPopupMenuItem {
 
     /**
@@ -104,7 +107,7 @@ abstract class GradleTaskAction private constructor(
             tasks != null -> tasks
             complexTasks != null -> complexTasks
                 .filter { it.shouldShow(event, project) }
-                .flatMap { it.tasks!! }
+                .flatMap { it.tasks ?: emptySet() }
                 .toSet()
 
             else -> emptySet()
@@ -139,8 +142,7 @@ abstract class GradleTaskAction private constructor(
  * @see GradleTaskAction
  * @see <a href="https://docs.gradle.org/current/userguide/base_plugin.html#sec:base_tasks">Gradle Base Plugin Tasks</a>
  */
-
-object CleanTaskAction : GradleTaskAction("clean")
+internal object CleanTaskAction : GradleTaskAction("clean")
 
 /**
  * Action to run the Detekt static code analysis tool via Gradle.
@@ -158,7 +160,7 @@ object CleanTaskAction : GradleTaskAction("clean")
  * @see GradleTaskAction
  * @see <a href="https://detekt.dev/">Detekt Documentation</a>
  */
-object DetektTaskAction : GradleTaskAction("detekt")
+internal object DetektTaskAction : GradleTaskAction("detekt")
 
 /**
  * Action to run Checkstyle code analysis via Gradle.
@@ -178,7 +180,7 @@ object DetektTaskAction : GradleTaskAction("detekt")
  * @see GradleTaskAction
  * @see <a href="https://checkstyle.sourceforge.io/">Checkstyle Documentation</a>
  */
-object CheckstyleTaskAction : GradleTaskAction("checkstyleMain")
+internal object CheckstyleTaskAction : GradleTaskAction("checkstyleMain")
 
 /**
  * Action to run Android Lint analysis via Gradle.
@@ -203,7 +205,7 @@ object CheckstyleTaskAction : GradleTaskAction("checkstyleMain")
  * @see GradleTaskAction
  * @see <a href="https://developer.android.com/studio/write/lint">Android Lint Documentation</a>
  */
-object LintTaskAction : GradleTaskAction("lint")
+internal object LintTaskAction : GradleTaskAction("lint")
 
 /**
  * Action to run all available static code analysis tools via Gradle.
@@ -233,7 +235,7 @@ object LintTaskAction : GradleTaskAction("lint")
  * @see LintTaskAction
  * @see GradleTaskAction
  */
-object AllStaticCodeAnalysisTaskAction : GradleTaskAction(
+internal object AllStaticCodeAnalysisTaskAction : GradleTaskAction(
     CheckstyleTaskAction,
     DetektTaskAction,
     LintTaskAction
@@ -266,7 +268,7 @@ object AllStaticCodeAnalysisTaskAction : GradleTaskAction(
  * @see GradleTaskAction
  * @see <a href="https://docs.gradle.org/current/userguide/java_plugin.html#lifecycle_tasks">Lifecycle Tasks</a>
  */
-object CheckTaskAction : GradleTaskAction("check")
+internal object CheckTaskAction : GradleTaskAction("check")
 
 /**
  * Action to run the Gradle 'build' task which performs a complete project build.
@@ -304,7 +306,7 @@ object CheckTaskAction : GradleTaskAction("check")
  * @see AssembleTaskAction
  * @see CheckTaskAction
  */
-object BuildTaskAction : GradleTaskAction("build")
+internal object BuildTaskAction : GradleTaskAction("build")
 
 /**
  * Action to run Android instrumented tests on a connected device or emulator.
@@ -339,7 +341,7 @@ object BuildTaskAction : GradleTaskAction("build")
  * @see <a href="https://developer.android.com/studio/test/test-in-android-studio">Testing in Android Studio</a>
  */
 @Suppress("ReturnCount")
-object ConnectedAndroidTestTaskAction : GradleTaskAction("connectedAndroidTest") {
+internal object ConnectedAndroidTestTaskAction : GradleTaskAction("connectedAndroidTest") {
 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
         val projectFile = event.currentFile?.findClosestProject(project) ?: return super.shouldShow(event, project)
@@ -395,7 +397,7 @@ object ConnectedAndroidTestTaskAction : GradleTaskAction("connectedAndroidTest")
  * @see ConnectedAndroidTestTaskAction
  * @see GradleTaskAction
  */
-object AllTestTypesTaskAction : GradleTaskAction(
+internal object AllTestTypesTaskAction : GradleTaskAction(
     BuildTaskAction,
     ConnectedAndroidTestTaskAction
 )
@@ -438,4 +440,4 @@ object AllTestTypesTaskAction : GradleTaskAction(
  * @see CheckTaskAction
  * @see <a href="https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_tasks">Gradle Java Plugin Tasks</a>
  */
-object AssembleTaskAction : GradleTaskAction("assemble")
+internal object AssembleTaskAction : GradleTaskAction("assemble")

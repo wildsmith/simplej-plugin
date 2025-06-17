@@ -20,7 +20,7 @@ internal class SimpleJIconsTests {
     private lateinit var mockIcon: Icon
 
     @BeforeEach
-    fun setup() {
+    fun setUp() {
         mockkStatic(IconLoader::class)
         mockIcon = mockk<Icon>()
     }

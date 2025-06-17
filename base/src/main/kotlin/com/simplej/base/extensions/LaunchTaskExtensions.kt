@@ -1,6 +1,7 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.base.extensions
 
+import androidx.annotation.RestrictTo
 import com.intellij.ide.BrowserUtil
 
 /**
@@ -15,5 +16,6 @@ import com.intellij.ide.BrowserUtil
  * @throws [com.intellij.ide.BrowserException] if the URL cannot be opened
  * @see com.intellij.ide.BrowserUtil.browse
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun openInBrowser(url: String) =
     BrowserUtil.browse(url)

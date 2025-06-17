@@ -1,6 +1,7 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.base
 
+import androidx.annotation.RestrictTo
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
@@ -21,6 +22,7 @@ import com.intellij.openapi.project.Project
  * 3. Override [actionPerformed] to define the action's behavior
  * 4. Optionally override [shouldShow] to add custom visibility logic
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 abstract class SimpleJAnAction : AnAction() {
 
     /**

@@ -28,7 +28,7 @@ import com.simplej.base.extensions.showError
  * - A properly configured GitHub remote in the Git repository
  * - Appropriate access rights to the GitHub repository
  */
-class OpenInGithubAction : GithubTrackedCodeAction() {
+internal class OpenInGithubAction : GithubTrackedCodeAction() {
 
     @Suppress("ReturnCount")
     override fun actionPerformed(event: AnActionEvent) {

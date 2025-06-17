@@ -27,6 +27,8 @@ import java.math.BigDecimal
  *   - Detekt for Kotlin static code analysis
  */
 internal fun Project.configureBaseProject(simpleJOptions: SimpleJOptions, isAndroidLibrary: Boolean) {
+    group = "com.simplej"
+
     repositories {
         mavenCentral()
         google()

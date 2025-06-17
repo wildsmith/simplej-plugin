@@ -1,6 +1,7 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.base.extensions
 
+import androidx.annotation.RestrictTo
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
@@ -34,6 +35,7 @@ internal const val PLUGIN_NAME = "SimpleJ Plugin"
  * @see com.intellij.notification.NotificationType
  * @see com.intellij.notification.Notification
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun Project?.showNotification(
     message: String,
     title: String = PLUGIN_NAME,

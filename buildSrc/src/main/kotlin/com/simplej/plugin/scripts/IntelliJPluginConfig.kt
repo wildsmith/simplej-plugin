@@ -2,13 +2,12 @@
 package com.simplej.plugin.scripts
 
 import org.gradle.api.Project
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.bundling.Zip
-import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.repositories
+import java.io.File
 
 /**
  * Configures the project as an IntelliJ Platform plugin.
@@ -55,65 +54,63 @@ internal fun Project.configureIntelliJPlugin() {
             }
             buildSearchableOptions.set(false)
         }
-        configureDistTasks()
+        configureArtifactTasks()
     }
 }
 
-private const val COPY_NEW_DIST_ARTIFACT_TASK_NAME = "copyNewDistArtifact"
-private const val DELETE_OLD_DIST_ARTIFACT_TASK_NAME = "deleteOldDistArtifact"
+private const val COPY_NEW_ARTIFACT_TASK_NAME = "copyNewArtifact"
+private const val DELETE_OLD_ARTIFACT_TASK_NAME = "deleteOldArtifact"
 private const val ZIP_SUFFIX = ".zip"
-private val EXCLUDED_FILE_PREFIXES = setOf(
-    "gradle-",
-    "groovy-",
-    "javaparser-",
-    "kotlin-reflect-"
-)
 
-private fun Project.configureDistTasks() {
-    val distDir = "$projectDir/../dist"
+private fun Project.configureArtifactTasks() {
+    val artifactDir = "$projectDir/../artifact"
 
-    val projectName = project.name
-
-    tasks.register(DELETE_OLD_DIST_ARTIFACT_TASK_NAME, Delete::class.java) {
-        description = "Deletes the old dist artifact."
+    tasks.register(DELETE_OLD_ARTIFACT_TASK_NAME, Delete::class.java) {
+        description = "Deletes the old zip from the artifact directory."
         group = "publishing"
 
-        delete(distDir)
+        delete(artifactDir)
 
-        finalizedBy(COPY_NEW_DIST_ARTIFACT_TASK_NAME)
+        finalizedBy(COPY_NEW_ARTIFACT_TASK_NAME)
     }
 
+    val projectName = project.name
     tasks.named("buildPlugin", Zip::class.java).configure {
-        exclude { file ->
-            EXCLUDED_FILE_PREFIXES.any { file.name.startsWith(it) }
-        }
+        // Call this during task configuration to avoid impacting the configuration phase. If the task isn't
+        // configured then the project version will not be set.
+        setProjetVersion(artifactDir, projectName)
 
-        val matchingFiles = fileTree(distDir).matching { include("$projectName-*.zip") }
-        if (matchingFiles.isEmpty) {
-            version = "0.0.1"
-        } else {
-            val zipFileName = matchingFiles.last().name.substringBefore(ZIP_SUFFIX)
-            val oldVersion = zipFileName.split("-").last().substringBefore("-")
-            var index = 0
-            version = oldVersion.split(".").joinToString(".") {
-                index++
-                if (index == 2) {
-                    "${it.toInt() + 1}"
-                } else {
-                    it
-                }
-            }
-        }
-
-        dependsOn(DELETE_OLD_DIST_ARTIFACT_TASK_NAME)
-        finalizedBy(COPY_NEW_DIST_ARTIFACT_TASK_NAME)
+        dependsOn(DELETE_OLD_ARTIFACT_TASK_NAME)
+        finalizedBy(COPY_NEW_ARTIFACT_TASK_NAME)
     }
 
-    tasks.register(COPY_NEW_DIST_ARTIFACT_TASK_NAME, Copy::class.java) {
-        description = "Copies the new artifact into dist."
+    tasks.register(COPY_NEW_ARTIFACT_TASK_NAME, Copy::class.java) {
+        description = "Copies the new zip into the artifact directory."
         group = "publishing"
 
         from("${layout.buildDirectory.get()}/distributions/$projectName-$version$ZIP_SUFFIX")
-        into(distDir)
+        into(artifactDir)
+    }
+}
+
+private fun Project.setProjetVersion(artifactDir: String, projectName: String?) {
+    val existingArtifact = rootProject.layout.projectDirectory.dir(artifactDir).asFile.listFiles()?.firstOrNull {
+        it.name.startsWith("$projectName-") && it.name.endsWith(ZIP_SUFFIX)
+    }
+    if (existingArtifact == null) {
+        version = "0.0.1"
+    } else {
+        val oldVersion = existingArtifact.name
+            .substringBefore(ZIP_SUFFIX)
+            .substringAfter("-")
+        var index = 0
+        version = oldVersion.split(".").joinToString(".") {
+            index++
+            if (index == 2) {
+                "${it.toInt() + 1}"
+            } else {
+                it
+            }
+        }
     }
 }

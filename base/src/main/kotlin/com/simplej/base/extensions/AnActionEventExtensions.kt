@@ -1,6 +1,7 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.base.extensions
 
+import androidx.annotation.RestrictTo
 import com.intellij.ide.actions.OpenFileAction
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.ActionManager
@@ -15,6 +16,7 @@ import java.io.File
  *
  * @param message The error message to be displayed in the notification
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun AnActionEvent.showError(message: String) =
     showNotification(message, type = NotificationType.ERROR)
 
@@ -26,6 +28,7 @@ fun AnActionEvent.showError(message: String) =
  * @param type The type of notification to show (defaults to INFORMATION)
  * @param actions Set of actions that can be performed from the notification (defaults to empty set)
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun AnActionEvent.showNotification(
     message: String,
     title: String = PLUGIN_NAME,
@@ -47,6 +50,7 @@ fun AnActionEvent.showNotification(
  * @param line Optional line number where the caret should be positioned (1-based indexing).
  *             If null, the caret position remains unchanged
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun AnActionEvent.openInIde(file: File, line: Int? = null) {
     val virtualFile = file.toVirtualFile() ?: return
     val project = project ?: return
@@ -65,11 +69,12 @@ fun AnActionEvent.openInIde(file: File, line: Int? = null) {
  * Synchronizes the Gradle project in the IDE.
  *
  * This extension function attempts to refresh/sync the Gradle project by:
- * 1. First trying to execute the "Gradle.RefreshAllProjects" action
+ * 1. Trying to execute the "Gradle.RefreshAllProjects" action...
  * 2. If that's not available, falling back to "Android.SyncProject" action
  *
  * This is useful when programmatic changes require the Gradle project to be resynced to reflect the updates in the IDE.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun AnActionEvent.gradleSync() {
     ActionManager.getInstance().getAction("Gradle.RefreshAllProjects")?.actionPerformed(this)
         ?: ActionManager.getInstance().getAction("Android.SyncProject")?.actionPerformed(this)

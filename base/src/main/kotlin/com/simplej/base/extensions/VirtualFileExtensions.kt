@@ -1,6 +1,7 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.base.extensions
 
+import androidx.annotation.RestrictTo
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.Project
@@ -19,6 +20,7 @@ import java.io.File
  * @return The current [VirtualFile] or null if no file is selected
  */
 val AnActionEvent.currentFile: VirtualFile?
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     get() = getData(CommonDataKeys.VIRTUAL_FILE)
 
 /**
@@ -30,6 +32,7 @@ val AnActionEvent.currentFile: VirtualFile?
  * @return An array of selected [VirtualFile]s. Returns an empty array if no files are selected
  */
 val AnActionEvent.currentFiles: Array<VirtualFile>
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     get() = getData(CommonDataKeys.VIRTUAL_FILE_ARRAY) ?: arrayOf()
 
 /**
@@ -40,6 +43,7 @@ val AnActionEvent.currentFiles: Array<VirtualFile>
  *
  * @return The corresponding [VirtualFile] or null if the file cannot be found in the virtual file system
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun File.toVirtualFile(): VirtualFile? =
     LocalFileSystem.getInstance().findFileByIoFile(this)
 
@@ -49,6 +53,7 @@ fun File.toVirtualFile(): VirtualFile? =
  * @param project The IntelliJ project context
  * @return The root [VirtualFile] with the shortest path length, or null if no root is found
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun VirtualFile.getRootProjectFile(project: Project): VirtualFile? =
     findAllProjectRoots(project).minByOrNull { it.path.length }
 
@@ -63,6 +68,7 @@ fun VirtualFile.getRootProjectFile(project: Project): VirtualFile? =
  * @param project The IntelliJ project context
  * @return Set of [VirtualFile]s representing all valid Gradle project roots
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun VirtualFile.findAllProjectRoots(project: Project): Set<VirtualFile> =
     ProjectRootManager.getInstance(project).contentRoots
         .filterTo(mutableSetOf()) {
@@ -79,6 +85,7 @@ fun VirtualFile.findAllProjectRoots(project: Project): Set<VirtualFile> =
  * @param project The current IntelliJ project context
  * @return The closest [VirtualFile] representing a Gradle project root, or null if none found
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun VirtualFile.findClosestProject(project: Project): VirtualFile? =
     findAllProjectRoots(project)
         .sortedBy { it.path.length }
@@ -90,6 +97,7 @@ fun VirtualFile.findClosestProject(project: Project): VirtualFile? =
  *
  * @return The build file as a [File] object, or null if neither build.gradle.kts nor build.gradle exists
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun VirtualFile.getBuildFile(): File? {
     var settingsFile = File("$path/build.gradle.kts")
     if (!settingsFile.exists()) {
@@ -106,6 +114,7 @@ fun VirtualFile.getBuildFile(): File? {
  *
  * @return The settings file as a [File] object, or null if neither settings.gradle.kts nor settings.gradle exists
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun VirtualFile.getSettingsFile(): File? {
     var buildFile = File("$path/settings.gradle.kts")
     if (!buildFile.exists()) {
@@ -122,6 +131,7 @@ fun VirtualFile.getSettingsFile(): File? {
  *
  * @return A [File] object representing the path to the CODEOWNERS file
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun VirtualFile.getCodeOwnersFile(): File =
     File("$path/.github/CODEOWNERS")
 
@@ -135,6 +145,7 @@ fun VirtualFile.getCodeOwnersFile(): File =
  * @param project The IntelliJ project context
  * @return The Gradle path notation as a String
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun VirtualFile.getGradlePath(project: Project): String =
     path.substring(getRootProjectFile(project)?.path?.length ?: 0).replace("/", ":")
 
@@ -143,4 +154,5 @@ fun VirtualFile.getGradlePath(project: Project): String =
  *
  * @return true if the file is not null and exists, false otherwise
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun File?.exists(): Boolean = this != null && exists()

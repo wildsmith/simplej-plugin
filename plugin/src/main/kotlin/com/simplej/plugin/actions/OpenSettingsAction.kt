@@ -6,7 +6,7 @@ import com.simplej.base.EditorPopupMenuItem
 import com.simplej.base.ProjectViewPopupMenuItem
 import com.simplej.base.SimpleJAnAction
 
-class OpenSettingsAction : SimpleJAnAction(), ProjectViewPopupMenuItem, EditorPopupMenuItem {
+internal class OpenSettingsAction : SimpleJAnAction(), ProjectViewPopupMenuItem, EditorPopupMenuItem {
 
     override fun actionPerformed(event: AnActionEvent) {
         TODO("Not yet implemented")

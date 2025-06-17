@@ -10,3 +10,7 @@ simpleJ {
         branch = 50
     }
 }
+
+dependencies {
+    implementation(libs.androidx.annotations)
+}

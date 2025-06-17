@@ -1,6 +1,7 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.base.extensions
 
+import androidx.annotation.RestrictTo
 import com.intellij.openapi.application.ApplicationManager
 
 /**
@@ -22,6 +23,7 @@ import com.intellij.openapi.application.ApplicationManager
  * @see ApplicationManager.getApplication
  * @see com.intellij.openapi.application.Application.executeOnPooledThread
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun executeBackgroundTask(task: () -> Unit) {
     ApplicationManager.getApplication().executeOnPooledThread {
         task()

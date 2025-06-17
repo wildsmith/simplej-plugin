@@ -4,6 +4,7 @@ package com.simplej.plugin.actions.github
 import com.intellij.notification.NotificationAction
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.simplej.base.extensions.currentFile
 import com.simplej.base.extensions.currentFiles
@@ -12,6 +13,7 @@ import com.simplej.base.extensions.getCodeOwnersFile
 import com.simplej.base.extensions.openInIde
 import com.simplej.base.extensions.showError
 import com.simplej.base.extensions.showNotification
+import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.PathMatcher
@@ -31,7 +33,7 @@ import java.nio.file.Paths
  * - Recursive wildcards (**)
  * - Directory-specific patterns (ending with /)
  */
-class LookupCodeOwnerAction : GithubTrackedCodeAction() {
+internal class LookupCodeOwnerAction : GithubTrackedCodeAction() {
 
     @Suppress("ReturnCount")
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
@@ -59,12 +61,19 @@ class LookupCodeOwnerAction : GithubTrackedCodeAction() {
             .findCodeOwnerRule(currentFile.path.substringAfter(project.name))
             ?: return event.showError("Unable to find code owner rule for file: ${currentFile.path}")
 
+        val message = "Code Owners: ${codeOwnerRule.owners.joinToString(", ")}"
         project.showNotification(
-            message = "Code Owners: ${codeOwnerRule.owners.joinToString(", ")}",
+            message = message,
             actions = mutableSetOf<AnAction>().apply {
                 add(
                     NotificationAction.createSimpleExpiring("CODEOWNERS") {
                         event.openInIde(codeOwnersFile, codeOwnerRule.humanReadableLineNumber)
+                    }
+                )
+                add(
+                    NotificationAction.createSimpleExpiring("Copy") {
+                        val copyPasteManager = CopyPasteManager.getInstance()
+                        copyPasteManager.setContents(StringSelection(message))
                     }
                 )
             }
@@ -165,12 +174,19 @@ class LookupCodeOwnerAction : GithubTrackedCodeAction() {
         /**
          * Checks if a given file path matches this rule's pattern.
          */
-        fun matches(filePath: String): Boolean =
-            if (pattern.endsWith('/')) {
+        fun matches(filePath: String): Boolean {
+            return if (pattern.endsWith('/')) {
                 filePath.startsWith(pattern.removeSuffix("/"))
             } else {
-                pathMatcher.matches(Paths.get(filePath.removePrefix("/")))
+                if (pattern.startsWith("*.")) {
+                    // File type ownership claim
+                    val extension = filePath.substringAfterLast('.')
+                    extension == pattern.removePrefix("*.")
+                } else {
+                    pathMatcher.matches(Paths.get(filePath.removePrefix("/")))
+                }
             }
+        }
 
         companion object {
 
