@@ -6,7 +6,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.project.Project
 
-const val PLUGIN_NAME = "SimpleJ Plugin"
+internal const val PLUGIN_NAME = "SimpleJ Plugin"
 
 /**
  * Shows a notification in the IDE for the current project.

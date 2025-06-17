@@ -6,7 +6,7 @@ plugins {
 simpleJ {
     intellijPlugin = true
     unitTestCoverageMinimums {
-        instruction = 12
-        branch = 17
+        instruction = 56
+        branch = 50
     }
 }

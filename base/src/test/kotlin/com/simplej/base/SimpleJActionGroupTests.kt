@@ -6,9 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.Presentation
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.unmockkAll
 import io.mockk.verify
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -25,11 +23,6 @@ internal class SimpleJActionGroupTests {
         mockEvent = mockk<AnActionEvent>(relaxed = true)
         mockPresentation = mockk<Presentation>(relaxed = true)
         every { mockEvent.presentation } returns mockPresentation
-    }
-
-    @AfterEach
-    fun tearDown() {
-        unmockkAll()
     }
 
     @Test
