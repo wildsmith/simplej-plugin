@@ -16,6 +16,8 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
 
 /**
@@ -182,3 +184,70 @@ internal fun Project.detekt(configuration: DetektExtension.() -> Unit) =
  */
 internal fun DependencyHandlerScope.testImplementation(dependencyNotation: Any) =
     add("testImplementation", dependencyNotation)
+
+/**
+ * Configures JaCoCo test report generation for all [JacocoReport] tasks in the project.
+ *
+ * This extension function simplifies the configuration of JaCoCo test coverage reports by applying
+ * the specified configuration to each [JacocoReport] task. It uses Gradle's type-safe configuration
+ * API to ensure all JaCoCo report tasks are properly configured.
+ *
+ * Example usage:
+ * ```kotlin
+ * jacocoTestReport {
+ *     reports {
+ *         xml.required.set(true)
+ *         html.required.set(true)
+ *         csv.required.set(false)
+ *     }
+ * }
+ * ```
+ *
+ * @param configuration Lambda with receiver that configures the [JacocoReport] task.
+ *                     The receiver scope provides direct access to all [JacocoReport] properties and methods.
+ */
+internal fun Project.jacocoTestReport(configuration: JacocoReport.() -> Unit) =
+    tasks.withType(JacocoReport::class.java).configureEach { configuration(this) }
+
+/**
+ * Configures JaCoCo test coverage verification rules for all [JacocoCoverageVerification] tasks in the project.
+ *
+ * This extension function facilitates the configuration of JaCoCo coverage verification rules by applying
+ * the specified configuration to each [JacocoCoverageVerification] task. It allows setting up coverage thresholds
+ * and verification rules to ensure code quality standards are met.
+ *
+ * Example usage:
+ * ```kotlin
+ * jacocoTestCoverageVerification {
+ *     violationRules {
+ *         rule {
+ *             element = "BUNDLE"
+ *             limit {
+ *                 counter = "INSTRUCTION"
+ *                 minimum = "0.80".toBigDecimal()
+ *             }
+ *             limit {
+ *                 counter = "BRANCH"
+ *                 minimum = "0.75".toBigDecimal()
+ *             }
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * Common coverage metrics that can be verified:
+ * - INSTRUCTION: Code instruction coverage
+ * - BRANCH: Branch coverage
+ * - LINE: Line coverage
+ * - COMPLEXITY: Cyclomatic complexity coverage
+ * - METHOD: Method coverage
+ * - CLASS: Class coverage
+ *
+ * The verification task typically runs after the test report generation and can be configured to fail
+ * the build if coverage requirements are not met.
+ *
+ * @param configuration Lambda with receiver that configures the [JacocoCoverageVerification] task.
+ *                     The receiver scope provides access to violation rules and coverage thresholds.
+ */
+internal fun Project.jacocoTestCoverageVerification(configuration: JacocoCoverageVerification.() -> Unit) =
+    tasks.withType(JacocoCoverageVerification::class.java).configureEach { configuration(this) }

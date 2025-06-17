@@ -3,4 +3,10 @@ plugins {
     id("org.jetbrains.intellij.platform.module")
 }
 
-simpleJ.intellijPlugin = true
+simpleJ {
+    intellijPlugin = true
+    unitTestCoverageMinimums {
+        instruction = 12
+        branch = 17
+    }
+}

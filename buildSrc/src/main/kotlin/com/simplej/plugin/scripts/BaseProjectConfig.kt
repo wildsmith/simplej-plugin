@@ -1,14 +1,18 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.plugin.scripts
 
+import com.simplej.plugin.scripts.dsl.SimpleJOptions
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.Project
 import org.gradle.api.plugins.quality.Checkstyle
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.repositories
+import org.gradle.testing.jacoco.plugins.JacocoTaskExtension
+import java.math.BigDecimal
 
 /**
  * Configures basic project settings and quality tools for the project.
@@ -22,7 +26,7 @@ import org.gradle.kotlin.dsl.repositories
  *   - Lint configuration
  *   - Detekt for Kotlin static code analysis
  */
-internal fun Project.configureBaseProject(isAndroidLibrary: Boolean) {
+internal fun Project.configureBaseProject(simpleJOptions: SimpleJOptions, isAndroidLibrary: Boolean) {
     repositories {
         mavenCentral()
         google()
@@ -30,7 +34,8 @@ internal fun Project.configureBaseProject(isAndroidLibrary: Boolean) {
     configureCheckstyle()
     configureLint(isAndroidLibrary)
     configureDetekt()
-    configureTests()
+    configureTestTasks()
+    configureJacoco(simpleJOptions, isAndroidLibrary)
 }
 
 private fun Project.configureCheckstyle() {
@@ -90,7 +95,7 @@ private fun Project.configureDetekt() {
     }
 }
 
-private fun Project.configureTests() {
+private fun Project.configureTestTasks() {
     tasks.withType(Test::class.java).configureEach {
         maxParallelForks = Runtime.getRuntime().availableProcessors()
         useJUnitPlatform()
@@ -104,3 +109,73 @@ private fun Project.configureTests() {
         testImplementation(versionCatalog.findLibrary("kotlin-test").get())
     }
 }
+
+private fun Project.configureJacoco(simpleJOptions: SimpleJOptions, isAndroidLibrary: Boolean) {
+    if (isAndroidLibrary) {
+        // The only Android project in the codebase is used for previews, no code from it is bundled with the
+        // plugin's artifact, ignore it for now
+        return
+    }
+
+    apply(plugin = "jacoco")
+
+    tasks.withType(Test::class.java).configureEach {
+        val jacoco = extensions["jacoco"] as JacocoTaskExtension
+        jacoco.isIncludeNoLocationClasses = true
+        jacoco.setExcludes(listOf("jdk.internal.*"))
+
+        finalizedBy("jacocoTestCoverageVerification")
+    }
+
+    tasks.named("jacocoTestCoverageVerification").configure {
+        dependsOn("jacocoTestReport")
+    }
+
+    jacocoTestReport {
+        reports {
+            html.required.set(true)
+        }
+    }
+
+    afterEvaluate {
+        val coverageMinimums = simpleJOptions.coverageMinimums
+        jacocoTestCoverageVerification {
+            violationRules {
+                rule {
+                    element = "BUNDLE"
+                    limit {
+                        counter = "INSTRUCTION"
+                        minimum = coverageMinimums.instruction.toJacocoBigDecimal()
+                    }
+                    limit {
+                        counter = "BRANCH"
+                        minimum = coverageMinimums.branch.toJacocoBigDecimal()
+                    }
+                    limit {
+                        counter = "LINE"
+                        minimum = coverageMinimums.line.toJacocoBigDecimal()
+                    }
+                    limit {
+                        counter = "COMPLEXITY"
+                        minimum = coverageMinimums.complexity.toJacocoBigDecimal()
+                    }
+                    limit {
+                        counter = "METHOD"
+                        minimum = coverageMinimums.method.toJacocoBigDecimal()
+                    }
+                    limit {
+                        counter = "CLASS"
+                        minimum = coverageMinimums.clazz.toJacocoBigDecimal()
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Jacoco's coverage ratio is between 0.0 and 1.0, convert the minimum from the SimpleJ Options to a compatible value
+ * by dividing them by 100.
+ */
+private fun Int.toJacocoBigDecimal(): BigDecimal =
+    (this / 100).toBigDecimal()

@@ -2,6 +2,7 @@
 package com.simplej.plugin.scripts.plugins
 
 import com.simplej.plugin.scripts.configureJavaLibrary
+import com.simplej.plugin.scripts.dsl.SimpleJOptions
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 
@@ -24,7 +25,7 @@ import org.gradle.kotlin.dsl.apply
  */
 class JavaLibraryConventionPlugin : RootConventionPlugin() {
 
-    override fun applyInternal(target: Project) {
-        target.configureJavaLibrary()
+    override fun applyInternal(target: Project, simpleJOptions: SimpleJOptions) {
+        target.configureJavaLibrary(simpleJOptions)
     }
 }

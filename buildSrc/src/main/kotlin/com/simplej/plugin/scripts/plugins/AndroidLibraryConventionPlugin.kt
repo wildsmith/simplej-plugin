@@ -2,6 +2,7 @@
 package com.simplej.plugin.scripts.plugins
 
 import com.simplej.plugin.scripts.configureAndroidLibrary
+import com.simplej.plugin.scripts.dsl.SimpleJOptions
 import org.gradle.api.Project
 
 /**
@@ -22,7 +23,7 @@ import org.gradle.api.Project
  */
 class AndroidLibraryConventionPlugin : RootConventionPlugin() {
 
-    override fun applyInternal(target: Project) {
-        target.configureAndroidLibrary()
+    override fun applyInternal(target: Project, simpleJOptions: SimpleJOptions) {
+        target.configureAndroidLibrary(simpleJOptions)
     }
 }

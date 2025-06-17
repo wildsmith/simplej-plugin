@@ -29,7 +29,7 @@ class SimpleJActionGroup : DefaultActionGroup() {
     /**
      * Updates the presentation of this action group.
      *
-     * Configures the group to be hidden from UI when it contains no actions, preventing empty menu sections.
+     * Configures the group to be hidden from the UI when it contains no actions, preventing empty menu sections.
      *
      * @param event The action event containing context information
      */

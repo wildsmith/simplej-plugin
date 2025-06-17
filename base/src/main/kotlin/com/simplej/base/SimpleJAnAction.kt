@@ -43,9 +43,7 @@ abstract class SimpleJAnAction : AnAction() {
      */
     final override fun update(event: AnActionEvent) {
         val project = event.project
-        if (project == null || !shouldShowInternal(event, project)) {
-            event.presentation.isVisible = false
-        }
+        event.presentation.isVisible = !(project == null || !shouldShowInternal(event, project))
     }
 
     /**

@@ -15,9 +15,9 @@ import org.gradle.api.Project
 abstract class RootConventionPlugin : Plugin<Project> {
 
     final override fun apply(target: Project) {
-        target.extensions.create("simpleJ", SimpleJOptions::class.java)
-        applyInternal(target)
+        val simpleJOptions = target.extensions.create("simpleJ", SimpleJOptions::class.java)
+        applyInternal(target, simpleJOptions)
     }
 
-    abstract fun applyInternal(target: Project)
+    abstract fun applyInternal(target: Project, simpleJOptions: SimpleJOptions)
 }

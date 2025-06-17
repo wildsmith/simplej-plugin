@@ -1,6 +1,7 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.plugin.scripts
 
+import com.simplej.plugin.scripts.dsl.SimpleJOptions
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 
@@ -26,11 +27,11 @@ private const val VERSION = 1
  *
  * The Android version used for SDK configuration is determined values with the version catalog.
  */
-internal fun Project.configureAndroidLibrary() {
+internal fun Project.configureAndroidLibrary(simpleJOptions: SimpleJOptions) {
     apply(plugin = "com.android.library")
     apply(plugin = "kotlin-android")
 
-    configureBaseProject(true)
+    configureBaseProject(simpleJOptions, true)
 
     val androidVersionInt = getAndroidVersion().toInt()
     android {
