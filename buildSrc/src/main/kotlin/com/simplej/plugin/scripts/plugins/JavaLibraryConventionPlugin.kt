@@ -28,4 +28,6 @@ class JavaLibraryConventionPlugin : RootConventionPlugin() {
     override fun applyInternal(target: Project, simpleJOptions: SimpleJOptions) {
         target.configureJavaLibrary(simpleJOptions)
     }
+
+    override fun isAndroidLibrary(): Boolean = false
 }

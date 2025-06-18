@@ -20,7 +20,7 @@ internal fun Project.configureJavaLibrary(simpleJOptions: SimpleJOptions) {
     apply(plugin = "java-library")
     apply(plugin = "kotlin")
 
-    configureBaseProject(simpleJOptions, false)
+    configureBaseProject(simpleJOptions)
 
     val javaVersion = "${getJavaVersion()}"
     tasks.withType(JavaCompile::class.java).configureEach {

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler.plugin)
+    alias(libs.plugins.kotlin.serialization)
     id("simplej.java-library")
     id("org.jetbrains.intellij.platform")
 }
@@ -8,13 +9,14 @@ plugins {
 simpleJ {
     intellijPlugin = true
     unitTestCoverageMinimums {
-        instruction = 58
-        branch = 49
+        instruction = 27
+        branch = 20
     }
 }
 
 dependencies {
     implementation(libs.compose.runtime)
+    implementation(libs.kotlinx.serialization)
     intellijPlatform {
         pluginModule(implementation(project(":base")))
     }

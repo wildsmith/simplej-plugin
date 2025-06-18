@@ -2,6 +2,7 @@
 package com.simplej.plugin.scripts.dsl
 
 import com.simplej.plugin.scripts.configureIntelliJPlugin
+import com.simplej.plugin.scripts.configureJacoco
 import org.gradle.api.Project
 
 /**
@@ -18,7 +19,10 @@ import org.gradle.api.Project
  * ```
  */
 @DslScope
-open class SimpleJOptions internal constructor(private val project: Project) {
+open class SimpleJOptions internal constructor(
+    private val project: Project,
+    internal val isAndroidLibrary: Boolean
+) {
 
     /**
      * Configures the project with IntelliJ's platform SDK
@@ -66,5 +70,6 @@ open class SimpleJOptions internal constructor(private val project: Project) {
      */
     fun unitTestCoverageMinimums(configuration: TestCoverageMinimums.() -> Unit) {
         coverageMinimums.configuration()
+        project.configureJacoco(this)
     }
 }

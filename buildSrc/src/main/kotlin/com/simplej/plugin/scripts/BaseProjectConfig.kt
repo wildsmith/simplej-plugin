@@ -26,7 +26,7 @@ import java.math.BigDecimal
  *   - Lint configuration
  *   - Detekt for Kotlin static code analysis
  */
-internal fun Project.configureBaseProject(simpleJOptions: SimpleJOptions, isAndroidLibrary: Boolean) {
+internal fun Project.configureBaseProject(simpleJOptions: SimpleJOptions) {
     group = "com.simplej"
 
     repositories {
@@ -34,10 +34,9 @@ internal fun Project.configureBaseProject(simpleJOptions: SimpleJOptions, isAndr
         google()
     }
     configureCheckstyle()
-    configureLint(isAndroidLibrary)
+    configureLint(simpleJOptions)
     configureDetekt()
     configureTestTasks()
-    configureJacoco(simpleJOptions, isAndroidLibrary)
 }
 
 private fun Project.configureCheckstyle() {
@@ -56,8 +55,8 @@ private fun Project.configureCheckstyle() {
     }
 }
 
-private fun Project.configureLint(isAndroidLibrary: Boolean) {
-    if (isAndroidLibrary) {
+private fun Project.configureLint(simpleJOptions: SimpleJOptions) {
+    if (simpleJOptions.isAndroidLibrary) {
         androidLibrary {
             lint {
                 abortOnError = true
@@ -112,8 +111,8 @@ private fun Project.configureTestTasks() {
     }
 }
 
-private fun Project.configureJacoco(simpleJOptions: SimpleJOptions, isAndroidLibrary: Boolean) {
-    if (isAndroidLibrary) {
+internal fun Project.configureJacoco(simpleJOptions: SimpleJOptions) {
+    if (simpleJOptions.isAndroidLibrary) {
         // The only Android project in the codebase is used for previews, no code from it is bundled with the
         // plugin's artifact, ignore it for now
         return
@@ -139,36 +138,34 @@ private fun Project.configureJacoco(simpleJOptions: SimpleJOptions, isAndroidLib
         }
     }
 
-    afterEvaluate {
-        val coverageMinimums = simpleJOptions.coverageMinimums
-        jacocoTestCoverageVerification {
-            violationRules {
-                rule {
-                    element = "BUNDLE"
-                    limit {
-                        counter = "INSTRUCTION"
-                        minimum = coverageMinimums.instruction.toJacocoBigDecimal()
-                    }
-                    limit {
-                        counter = "BRANCH"
-                        minimum = coverageMinimums.branch.toJacocoBigDecimal()
-                    }
-                    limit {
-                        counter = "LINE"
-                        minimum = coverageMinimums.line.toJacocoBigDecimal()
-                    }
-                    limit {
-                        counter = "COMPLEXITY"
-                        minimum = coverageMinimums.complexity.toJacocoBigDecimal()
-                    }
-                    limit {
-                        counter = "METHOD"
-                        minimum = coverageMinimums.method.toJacocoBigDecimal()
-                    }
-                    limit {
-                        counter = "CLASS"
-                        minimum = coverageMinimums.clazz.toJacocoBigDecimal()
-                    }
+    val coverageMinimums = simpleJOptions.coverageMinimums
+    jacocoTestCoverageVerification {
+        violationRules {
+            rule {
+                element = "BUNDLE"
+                limit {
+                    counter = "INSTRUCTION"
+                    minimum = coverageMinimums.instruction.toJacocoBigDecimal()
+                }
+                limit {
+                    counter = "BRANCH"
+                    minimum = coverageMinimums.branch.toJacocoBigDecimal()
+                }
+                limit {
+                    counter = "LINE"
+                    minimum = coverageMinimums.line.toJacocoBigDecimal()
+                }
+                limit {
+                    counter = "COMPLEXITY"
+                    minimum = coverageMinimums.complexity.toJacocoBigDecimal()
+                }
+                limit {
+                    counter = "METHOD"
+                    minimum = coverageMinimums.method.toJacocoBigDecimal()
+                }
+                limit {
+                    counter = "CLASS"
+                    minimum = coverageMinimums.clazz.toJacocoBigDecimal()
                 }
             }
         }
@@ -177,7 +174,7 @@ private fun Project.configureJacoco(simpleJOptions: SimpleJOptions, isAndroidLib
 
 /**
  * Jacoco's coverage ratio is between 0.0 and 1.0, convert the minimum from the SimpleJ Options to a compatible value
- * by dividing them by 100.
+ * by dividing them by 100.0.
  */
 private fun Int.toJacocoBigDecimal(): BigDecimal =
-    (this / 100).toBigDecimal()
+    if (this == 0) BigDecimal.ZERO else (this / 100.0).toBigDecimal()

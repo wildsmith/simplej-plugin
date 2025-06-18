@@ -31,7 +31,7 @@ internal fun Project.configureAndroidLibrary(simpleJOptions: SimpleJOptions) {
     apply(plugin = "com.android.library")
     apply(plugin = "kotlin-android")
 
-    configureBaseProject(simpleJOptions, true)
+    configureBaseProject(simpleJOptions)
 
     val androidVersionInt = getAndroidVersion().toInt()
     android {

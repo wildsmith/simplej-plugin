@@ -12,6 +12,7 @@ detekt-gradle-plugin = "1.23.8"
 mockk = "1.13.8"
 junit-jupiter = "5.10.1"
 androidx-annotation = "1.9.1"
+kotlinx-serialization-json = "1.8.1"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
@@ -24,7 +25,9 @@ jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "j
 jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-lang" }
 androidx-annotations = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 
 [plugins]
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 compose-compiler-plugin = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin-lang" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-lang" }

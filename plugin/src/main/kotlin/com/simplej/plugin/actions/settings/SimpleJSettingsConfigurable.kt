@@ -2,8 +2,13 @@
 package com.simplej.plugin.actions.settings
 
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.project.ProjectManager
+import com.intellij.ui.dsl.builder.COLUMNS_LARGE
+import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
+import com.simplej.plugin.SimpleJConfig
+import com.simplej.plugin.simpleJConfig
 import javax.swing.JComponent
 
 /**
@@ -16,6 +21,11 @@ import javax.swing.JComponent
  * - Handle settings persistence
  */
 internal class SimpleJSettingsConfigurable : Configurable {
+
+    private val simpleJConfig: SimpleJConfig? by lazy {
+        // This is a hack, find a safer way if one exists
+        ProjectManager.getInstance().openProjects.firstOrNull()?.simpleJConfig()
+    }
 
     private val settings: SimpleJSettings by lazy {
         SimpleJSettings.instance
@@ -33,32 +43,96 @@ internal class SimpleJSettingsConfigurable : Configurable {
         )
     }
 
-    override fun getDisplayName(): String {
-        return "SimpleJ Settings"
-    }
+    override fun getDisplayName(): String = "SimpleJ Settings"
 
+    @Suppress("LongMethod")
     override fun createComponent(): JComponent =
         panel {
-            group("Default Tasks") {
-                row {
-                    text(
-                        "The following tasks are preloaded by SimpleJ and offered as default options " +
-                                "within the 'Run...' action group."
-                    )
-                }
-                uiBoundDefaultTasks.forEach { taskState ->
-                    row {
-                        checkBox(taskState.name)
-                            .comment(taskState.description)
-                            .selected(taskState.enabled)
-                            .onChanged {
-                                // For some reason `bindSelected` wasn't updating the value but this exlicit listener
-                                // works
-                                taskState.enabled = it.isSelected
+            simpleJConfig?.let { simpleJConfig ->
+                simpleJConfig.workspaceCompat?.let { workspaceCompat ->
+                    group("Workspace Compat", indent = false) {
+                        row {
+                            text(
+                                "Workspace compatability is determined by <code>config > simplej.json</code>. Talk " +
+                                        "with the file owner before making changes."
+                            ).applyToComponent {
+                                insets.left = 0
                             }
+                        }
+                        indent {
+                            workspaceCompat.ssh?.let { ssh ->
+                                if (!ssh.testEndpoint.isNullOrBlank()) {
+                                    row("SSH test endpoint:") {
+                                        customTextField(ssh.testEndpoint)
+                                        rowComment("This endpoint will be used to validate proper SSH configuration.")
+                                    }
+                                }
+                            }
+                            workspaceCompat.java?.let { java ->
+                                if (java.version != null) {
+                                    row("Java version:") {
+                                        customTextField(java.version.toString())
+                                        rowComment(
+                                            "Java version is the preferred field to validate Java " +
+                                                    "compatibility. When not specified, the home directory will be " +
+                                                    "used as a fallback."
+                                        )
+                                    }
+                                }
+                                if (!java.home.isNullOrBlank()) {
+                                    row("Java home directory:") {
+                                        customTextField(java.home)
+                                        rowComment(
+                                            "If Java version is not specified the home directory will be " +
+                                                    "used as a fallback."
+                                        )
+                                    }
+                                }
+                            }
+                            workspaceCompat.android?.let { android ->
+                                if (android.buildTools != null) {
+                                    row("Android build tools:") {
+                                        customTextField(android.buildTools.toString())
+                                        rowComment(
+                                            "Build tool misalignment can often lead to PKIX (public " +
+                                                    "key infrastructure) errors. The build tools version should match."
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
+            group("Gradle Tasks", indent = false) {
+                row {
+                    text(
+                        "The following tasks are preloaded by SimpleJ and offered as options " +
+                                "within the 'Run...' action group."
+                    )
+                }
+                indent {
+                    uiBoundDefaultTasks.forEach { taskState ->
+                        row {
+                            checkBox(taskState.name)
+                                .comment(taskState.description)
+                                .selected(taskState.enabled)
+                                .onChanged {
+                                    // For some reason `bindSelected` wasn't updating the value but this explicit
+                                    // listener works
+                                    taskState.enabled = it.isSelected
+                                }
+                        }
+                    }
+                }
+            }
+        }
+
+    private fun Row.customTextField(text: String) =
+        textField().applyToComponent {
+            setText(text)
+            columns = COLUMNS_LARGE
+            isEditable = false
         }
 
     /**

@@ -16,6 +16,15 @@ import java.io.File
 internal const val PLUGIN_NAME = "SimpleJ Plugin"
 
 /**
+ * Shows an error notification in the IDE.
+ *
+ * @param message The error message to be displayed in the notification
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun Project.showError(message: String, title: String = PLUGIN_NAME) =
+    showNotification(message, title = title, type = NotificationType.ERROR)
+
+/**
  * Shows a notification in the IDE for the current project.
  *
  * Displays a balloon notification in the event log with the specified message, title, type, and optional actions.

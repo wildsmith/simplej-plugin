@@ -50,10 +50,10 @@
                 group-id="EditorPopupMenu"
                 anchor="first"/>
             <action
-                    id="com.simplej.DeleteModuleAction"
-                    class="com.simplej.plugin.actions.deletion.DeleteModuleAction"
-                    icon="AllIcons.General.Delete"
-                    text="Delete Module"/>
+                id="com.simplej.DeleteModuleAction"
+                class="com.simplej.plugin.actions.deletion.DeleteModuleAction"
+                icon="AllIcons.General.Delete"
+                text="Delete Module"/>
             <separator/>
             <group
                 id="com.simplej.GradleActionsGroup"
