@@ -7,7 +7,6 @@ import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.selected
 import com.simplej.plugin.SimpleJConfig
 import com.simplej.plugin.simpleJConfig
 import javax.swing.JComponent
