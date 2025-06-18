@@ -48,15 +48,19 @@ internal fun Project.getGithubUrl(
             "#L$startLine"
         }
     }
-    val remoteUrl = GitUtil.getRepositoryForFile(this, projectFile)
+    val repo = GitUtil.getRepositoryForFile(this, projectFile)
+    val remoteUrl = repo
         .remotes
         .firstOrNull { it.name == "origin" }
         ?.firstUrl
         ?.substringBefore(".git")
+        ?.substringAfter("@")
+        ?.replace(".com:", ".com/")
+        ?.substringAfter("://")
     return if (remoteUrl != null) {
         val lastSegment = remoteUrl.substringAfterLast("/")
         val pathSegment = currentFile.path.substringAfterLast(lastSegment)
-        "$remoteUrl/blob/main$pathSegment$linePath"
+        "https://$remoteUrl/blob/${repo.currentBranchName}$pathSegment$linePath"
     } else {
         null
     }

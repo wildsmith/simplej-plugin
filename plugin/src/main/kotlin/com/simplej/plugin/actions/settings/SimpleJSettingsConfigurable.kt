@@ -5,6 +5,7 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.dsl.builder.COLUMNS_LARGE
 import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
 import com.simplej.plugin.SimpleJConfig
@@ -115,13 +116,13 @@ internal class SimpleJSettingsConfigurable : Configurable {
                     uiBoundDefaultTasks.forEach { taskState ->
                         row {
                             checkBox(taskState.name)
-                                .comment(taskState.description)
-                                .selected(taskState.enabled)
+                                .bindSelected(taskState::enabled)
                                 .onChanged {
                                     // For some reason `bindSelected` wasn't updating the value but this explicit
                                     // listener works
                                     taskState.enabled = it.isSelected
                                 }
+                                .comment(taskState.description)
                         }
                     }
                 }
