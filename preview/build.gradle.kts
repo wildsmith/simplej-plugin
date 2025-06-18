@@ -10,7 +10,7 @@ android {
     buildFeatures {
         compose = true
     }
-    resourcePrefix = "spg"
+    resourcePrefix = "sp"
 }
 
 dependencies {
