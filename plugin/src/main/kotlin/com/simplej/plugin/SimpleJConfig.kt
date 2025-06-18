@@ -15,7 +15,8 @@ private val jsonSerializer: Json by lazy {
 /**
  * Loads and parses the SimpleJ configuration from a JSON file.
  *
- * @param simpleJConfigFile The configuration file to load. Defaults to 'config/simplej.json' in the project's base path.
+ * @param simpleJConfigFile The configuration file to load. Defaults to 'config/simplej.json' in the project's base
+ * path.
  * @return The parsed [SimpleJConfig] object, or null if the file doesn't exist.
  */
 internal fun Project.simpleJConfig(
@@ -58,11 +59,11 @@ internal data class WorkspaceCompat(
 /**
  * SSH configuration settings.
  *
- * @property testEndpoint The SSH endpoint used for testing connectivity
+ * @property testRepo The SSH endpoint used for testing connectivity
  */
 @Serializable
 internal data class SshConfig(
-    val testEndpoint: String? = null
+    val testRepo: String? = null
 )
 
 /**

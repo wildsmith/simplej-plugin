@@ -1,7 +1,7 @@
 {
   "workspaceCompat": {
     "ssh": {
-      "testEndpoint": "git@github.com:wildsmith/simplej-plugin.git"
+      "testRepo": "git@github.com:wildsmith/simplej-plugin.git"
     },
     "java": {
       "home": "/Applications/Android Studio.app/Contents/jbr/Contents/Home",

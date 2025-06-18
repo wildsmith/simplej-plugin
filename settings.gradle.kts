@@ -12,6 +12,6 @@ include(
     ":base",
     ":demo-modules:delete-me-no-references",
     ":demo-modules:delete-me-with-references",
-    ":playground",
+    ":preview",
     ":plugin",
 )

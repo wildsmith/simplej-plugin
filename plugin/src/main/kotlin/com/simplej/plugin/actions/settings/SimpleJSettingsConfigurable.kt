@@ -61,9 +61,9 @@ internal class SimpleJSettingsConfigurable : Configurable {
                         }
                         indent {
                             workspaceCompat.ssh?.let { ssh ->
-                                if (!ssh.testEndpoint.isNullOrBlank()) {
-                                    row("SSH test endpoint:") {
-                                        customTextField(ssh.testEndpoint)
+                                if (!ssh.testRepo.isNullOrBlank()) {
+                                    row("SSH test repo:") {
+                                        customTextField(ssh.testRepo)
                                         rowComment("This endpoint will be used to validate proper SSH configuration.")
                                     }
                                 }

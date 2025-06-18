@@ -1,29 +1,55 @@
 [versions]
+# Lang versions, do not delete
 java-lang = "17"
 kotlin-lang = "2.1.21"
-compose = "1.8.1"
+
+# Used to configure the only Android module, Preview, do not delete
+android-target = "35"
+
+# IntelliJ Plugin values, do not delete
 intellij-since-build = "241"
 intellij-until-build = "251"
 intellij-release = "2024.2.3"
-android-target = "35"
+
+# Gradle Plugins
 android-gradle-plugin = "8.9.1"
-intellij-gradle-plugin = "2.6.0"
+compose = "1.8.1"
 detekt-gradle-plugin = "1.23.8"
+intellij-gradle-plugin = "2.6.0"
+
+# Testing library versions
 mockk = "1.13.8"
 junit-jupiter = "5.10.1"
+
+# Misc
 androidx-annotation = "1.9.1"
 kotlinx-serialization-json = "1.8.1"
 
 [libraries]
+# Gradle Plugins
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
+detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt-gradle-plugin" }
 intellij-platform-gradle-plugin = { module = "org.jetbrains.intellij.platform:intellij-platform-gradle-plugin", version.ref = "intellij-gradle-plugin" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-lang" }
-detekt-gradle-plugin = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt-gradle-plugin" }
+
+# Compose Multi Platform libraries
+compose-component-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
+compose-desktop = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "compose" }
+compose-desktop-jvm-mac-os-arm = { module = "org.jetbrains.compose.desktop:desktop-jvm-macos-arm64", version.ref = "compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui-util = { module = "org.jetbrains.compose.ui:ui-util", version.ref = "compose" }
+
+# Testing libraries used by buildSrc, do not delete
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin-lang" }
+
+# Misc
 androidx-annotations = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 

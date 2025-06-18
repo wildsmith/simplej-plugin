@@ -129,13 +129,13 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
      * @param simpleJConfig The SimpleJ configuration
      */
     private fun validateSshConnection(project: Project, simpleJConfig: SimpleJConfig) {
-        val githubUrl = simpleJConfig.workspaceCompat?.ssh?.testEndpoint
+        val githubUrl = simpleJConfig.workspaceCompat?.ssh?.testRepo
         if (githubUrl.isNullOrBlank()) {
             // Opt out of the ssh check when no test endpoint has been configured
             return
         }
 
-        if (!githubUrl.matches(Regex("git@github\\.com:.+/.+\\.git"))) {
+        if (!githubUrl.matches(Regex("git@github(.*)\\.com:.+/.+\\.git"))) {
             project.showNotification(
                 "Invalid GitHub SSH URL format. Expected format: git@github.com:username/repo.git",
                 SSH_VALIDATION_ERROR
