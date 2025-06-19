@@ -17,7 +17,5 @@ simpleJ {
 dependencies {
     implementation(libs.compose.runtime)
     implementation(libs.kotlinx.serialization)
-    intellijPlatform {
-        pluginModule(implementation(project(":base")))
-    }
+    implementation(project(":base"))
 }

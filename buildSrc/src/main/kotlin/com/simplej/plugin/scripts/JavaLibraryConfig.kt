@@ -5,6 +5,7 @@ import com.simplej.plugin.scripts.dsl.SimpleJOptions
 import org.gradle.api.Project
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.kotlin.dsl.apply
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 /**
  * Configures the project as a Java library with Kotlin support.
@@ -26,5 +27,11 @@ internal fun Project.configureJavaLibrary(simpleJOptions: SimpleJOptions) {
     tasks.withType(JavaCompile::class.java).configureEach {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
+    }
+    
+    tasks.withType(KotlinCompile::class.java).configureEach {
+        kotlinOptions {
+            jvmTarget = javaVersion
+        }
     }
 }
