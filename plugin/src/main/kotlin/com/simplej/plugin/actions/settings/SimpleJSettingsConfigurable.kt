@@ -35,13 +35,14 @@ internal class SimpleJSettingsConfigurable : Configurable {
      * Mutable set of task states that are bound to UI components. This set maintains the UI state independently of
      * the persisted settings until changes are explicitly applied.
      */
-    private var uiBoundDefaultTasks = SimpleJSettings.instance.state.defaultTasks.mapTo(mutableSetOf()) {
-        SimpleJSettings.State.TaskState(
-            name = it.name,
-            description = it.description,
-            enabled = it.enabled
-        )
-    }
+    private var uiBoundDefaultTasks =
+        SimpleJSettings.instance.state.defaultTasks.mapTo(mutableSetOf()) {
+            SimpleJSettings.State.TaskState(
+                name = it.name,
+                description = it.description,
+                enabled = it.enabled
+            )
+        }
 
     override fun getDisplayName(): String = "SimpleJ Settings"
 
@@ -127,15 +128,11 @@ internal class SimpleJSettingsConfigurable : Configurable {
                 }
             }
 
-            group("Inline Browser", indent = false) {
+            group("Other", indent = false) {
                 row {
-                    text("Enable the inline browser to show up for files located in the \"web-browser-mappings.json\"")
-                }
-                indent {
-                    row {
-                        checkBox("")
-                            .bindSelected(settings.state::inlineBrowserEnabled)
-                    }
+                    checkBox("Inline Browser")
+                        .bindSelected(settings.state::inlineBrowserEnabled)
+                        .comment("Enable the inline browser to show up for files located in the \"web-browser-mappings.json\"")
                 }
             }
         }

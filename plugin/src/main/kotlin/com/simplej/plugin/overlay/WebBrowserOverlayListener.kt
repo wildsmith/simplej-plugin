@@ -7,12 +7,10 @@ import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.ui.jcef.JBCefApp
+import com.simplej.plugin.actions.settings.SimpleJSettings
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.util.concurrent.ConcurrentHashMap
-import javax.swing.JLayeredPane
-import javax.swing.JRootPane
 import javax.swing.SwingUtilities
 
 internal class WebBrowserOverlayListener : EditorFactoryListener {
@@ -20,6 +18,7 @@ internal class WebBrowserOverlayListener : EditorFactoryListener {
     private val overlays = ConcurrentHashMap<Editor, WebBrowserOverlay>()
     
     override fun editorCreated(event: EditorFactoryEvent) {
+        if (!SimpleJSettings.instance.state.inlineBrowserEnabled) return
         val editor = event.editor
         val project = editor.project ?: return
         val document = editor.document
