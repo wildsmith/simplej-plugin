@@ -42,6 +42,9 @@ internal class SimpleJSettings : PersistentStateComponent<SimpleJSettings.State>
     }
 
     internal class State {
+
+        var inlineBrowserEnabled = false
+
         var defaultTasks: Set<TaskState> = setOf(
             TaskState(
                 name = "checkstyle",

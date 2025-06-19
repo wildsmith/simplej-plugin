@@ -126,6 +126,18 @@ internal class SimpleJSettingsConfigurable : Configurable {
                     }
                 }
             }
+
+            group("Inline Browser", indent = false) {
+                row {
+                    text("Enable the inline browser to show up for files located in the \"web-browser-mappings.json\"")
+                }
+                indent {
+                    row {
+                        checkBox("")
+                            .bindSelected(settings.state::inlineBrowserEnabled)
+                    }
+                }
+            }
         }
 
     private fun Row.customTextField(text: String) =
