@@ -129,10 +129,12 @@ internal class SimpleJSettingsConfigurable : Configurable {
             }
 
             group("Other", indent = false) {
-                row {
-                    checkBox("Inline Browser")
-                        .bindSelected(settings.state::inlineBrowserEnabled)
-                        .comment("Enable the inline browser to show up for files located in the \"web-browser-mappings.json\"")
+                indent {
+                    row {
+                        checkBox("Inline browser")
+                            .bindSelected(settings.state::inlineBrowserEnabled)
+                            .comment("Enable the inline browser to display for mapped file paths in `simplej.json`.")
+                    }
                 }
             }
         }

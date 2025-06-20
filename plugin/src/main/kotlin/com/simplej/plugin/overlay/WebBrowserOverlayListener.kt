@@ -7,7 +7,9 @@ import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.simplej.base.extensions.showError
 import com.simplej.plugin.actions.settings.SimpleJSettings
+import com.simplej.plugin.simpleJConfig
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.util.concurrent.ConcurrentHashMap
@@ -16,36 +18,37 @@ import javax.swing.SwingUtilities
 internal class WebBrowserOverlayListener : EditorFactoryListener {
 
     private val overlays = ConcurrentHashMap<Editor, WebBrowserOverlay>()
-    
+
+    @Suppress("ReturnCount")
     override fun editorCreated(event: EditorFactoryEvent) {
         if (!SimpleJSettings.instance.state.inlineBrowserEnabled) return
         val editor = event.editor
         val project = editor.project ?: return
         val document = editor.document
         val file = FileDocumentManager.getInstance().getFile(document) ?: return
-        
+
         // Check if this file has a URL mapping to our json file
         checkAndCreateOverlay(editor, project, file)
-        
+
         // Add component listener to handle editor resizing
-        editor.contentComponent.addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                overlays[editor]?.let { overlay ->
-                    SwingUtilities.invokeLater {
-                        overlay.updateBounds()
-                        overlay.revalidate()
-                        overlay.repaint()
+        editor.contentComponent.addComponentListener(
+            object : ComponentAdapter() {
+                override fun componentResized(e: ComponentEvent) {
+                    overlays[editor]?.let { overlay ->
+                        SwingUtilities.invokeLater {
+                            overlay.updateBounds()
+                            overlay.revalidate()
+                            overlay.repaint()
+                        }
                     }
                 }
             }
-        })
+        )
     }
-    
-    override fun editorReleased(event: EditorFactoryEvent) {
-        val editor = event.editor
-        removeOverlay(editor)
-    }
-    
+
+    override fun editorReleased(event: EditorFactoryEvent) =
+        removeOverlay(event.editor)
+
     /**
      * Checks if the given file has a URL mapping and creates an overlay if it does.
      */
@@ -54,34 +57,34 @@ internal class WebBrowserOverlayListener : EditorFactoryListener {
         val filePath = file.path
 
         // Get URL for this file
-        val url = WebBrowserConfigService.getUrlForFile(projectPath, filePath)
-        
+        val url = project.simpleJConfig()?.webBrowserMappings?.getUrlForFile(projectPath, filePath)
         if (url != null) {
             SwingUtilities.invokeLater {
                 createOverlay(editor, url)
             }
         } else {
-            // Remove overlay if file no longer has a mapping
+            // Remove overlay if the file no longer has a mapping
             removeOverlay(editor)
         }
     }
-    
+
     /**
      * Browser builder
      */
+    @Suppress("SwallowedException", "TooGenericExceptionCaught")
     private fun createOverlay(editor: Editor, url: String) {
-        // Remove existing overlay if present
+        // Remove the existing overlay if present
         removeOverlay(editor)
-        
+
         try {
             val overlay = WebBrowserOverlay(editor, url)
             overlays[editor] = overlay
-            
+
             // Get the editor's content component (where the actual text is)
             val editorComponent = editor.contentComponent
             editorComponent.add(overlay)
-            editorComponent.setComponentZOrder(overlay, 0) // Bring to front
-            
+            editorComponent.setComponentZOrder(overlay, 0) // Bring to the front
+
             // Ensure overlay is positioned correctly
             SwingUtilities.invokeLater {
                 overlay.updateBounds()
@@ -90,16 +93,20 @@ internal class WebBrowserOverlayListener : EditorFactoryListener {
                 editorComponent.revalidate()
                 editorComponent.repaint()
             }
-            
+
         } catch (e: Exception) {
             // Handle any issues with browser creation
-            e.printStackTrace()
+            editor.project?.showError(
+                "Unable to create browser overlay. Please report this issue to the plugin " +
+                        "author."
+            )
         }
     }
 
     /**
      * Without this, the browser can get stuck, so we want to revalidate the component often to make sure its not borked
      */
+    @Suppress("SwallowedException", "TooGenericExceptionCaught")
     private fun removeOverlay(editor: Editor) {
         overlays.remove(editor)?.let { overlay ->
             SwingUtilities.invokeLater {
@@ -110,12 +117,15 @@ internal class WebBrowserOverlayListener : EditorFactoryListener {
                     editor.contentComponent.repaint()
                 } catch (e: Exception) {
                     // Handle disposal errors gracefully
-                    e.printStackTrace()
+                    editor.project?.showError(
+                        "Unable to dispose browser overlay. Please report this issue to the " +
+                                "plugin author."
+                    )
                 }
             }
         }
     }
-    
+
     /**
      * Updates the overlay URL when switching to a different file that also has a mapping.
      * This is called when the same editor shows a different file.
@@ -124,24 +134,23 @@ internal class WebBrowserOverlayListener : EditorFactoryListener {
         val project = editor.project ?: return
         val projectPath = project.basePath ?: return
         val filePath = file.path
-        
-        val url = WebBrowserConfigService.getUrlForFile(projectPath, filePath)
-        
+
+        val url = project.simpleJConfig()?.webBrowserMappings?.getUrlForFile(projectPath, filePath)
         if (url != null) {
             val existingOverlay = overlays[editor]
             if (existingOverlay != null) {
-                // Update existing overlay with new URL
+                // Update the existing overlay with new URL
                 SwingUtilities.invokeLater {
                     existingOverlay.updateUrl(url)
                 }
             } else {
-                // Create new overlay
+                // Create a new overlay
                 SwingUtilities.invokeLater {
                     createOverlay(editor, url)
                 }
             }
         } else {
-            // Remove overlay if new file doesn't have a mapping
+            // Remove overlay if the new file doesn't have a mapping
             removeOverlay(editor)
         }
     }

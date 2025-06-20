@@ -8,8 +8,8 @@ android-target = "35"
 
 # IntelliJ Plugin values, do not delete
 intellij-since-build = "241"
-intellij-until-build = "251"
-intellij-release = "2024.2.3"
+intellij-until-build = "252"
+intellij-release = "2024.2.5"
 
 # Gradle Plugins
 android-gradle-plugin = "8.9.1"

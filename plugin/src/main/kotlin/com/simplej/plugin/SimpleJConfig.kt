@@ -39,7 +39,8 @@ internal fun Project.simpleJConfig(
  */
 @Serializable
 internal data class SimpleJConfig(
-    val workspaceCompat: WorkspaceCompat? = null
+    val workspaceCompat: WorkspaceCompat? = null,
+    val webBrowserMappings: WebBrowserMappings? = null,
 )
 
 /**
@@ -140,5 +141,27 @@ internal data class SemanticVersion(
         "(.*)"
     } else {
         ".$this"
+    }
+}
+
+/**
+ * Configuration data class for web browser overlay mappings. Maps file paths to URLs for displaying in the editor
+ * browser overlay.
+ */
+@Serializable
+internal data class WebBrowserMappings(
+    val fileMappings: Map<String, String>? = null
+) {
+
+    /**
+     * Gets the URL for a given file path from the configuration.
+     */
+    fun getUrlForFile(projectPath: String, filePath: String): String? {
+        // Try the exact match first
+        fileMappings?.get(filePath)?.let { return it }
+
+        // Try relative path matches
+        val relativePath = filePath.substringAfter(projectPath).removePrefix("/")
+        return fileMappings?.get(relativePath)
     }
 }
