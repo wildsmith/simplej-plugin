@@ -135,6 +135,11 @@ internal class SimpleJSettingsConfigurable : Configurable {
                     row {
                         checkBox("Inline browser")
                             .bindSelected(settings.state::inlineBrowserEnabled)
+                            .onChanged {
+                                // For some reason `bindSelected` wasn't updating the value but this explicit
+                                // listener works
+                                uiBoundInlineBrowserEnabled = it.isSelected
+                            }
                             .comment("Enable the inline browser to display for mapped file paths in `simplej.json`.")
                     }
                 }
@@ -154,7 +159,7 @@ internal class SimpleJSettingsConfigurable : Configurable {
      * @return true if the settings have been modified, false otherwise
      */
     override fun isModified(): Boolean {
-        return uiBoundDefaultTasks != settings.state.defaultTasks &&
+        return uiBoundDefaultTasks != settings.state.defaultTasks ||
                 uiBoundInlineBrowserEnabled != settings.state.inlineBrowserEnabled
     }
 
