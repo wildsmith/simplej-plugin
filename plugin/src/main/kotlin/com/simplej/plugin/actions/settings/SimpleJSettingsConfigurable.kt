@@ -44,6 +44,8 @@ internal class SimpleJSettingsConfigurable : Configurable {
             )
         }
 
+    private var uiBoundInlineBrowserEnabled = settings.state.inlineBrowserEnabled
+
     override fun getDisplayName(): String = "SimpleJ Settings"
 
     @Suppress("LongMethod")
@@ -152,7 +154,8 @@ internal class SimpleJSettingsConfigurable : Configurable {
      * @return true if the settings have been modified, false otherwise
      */
     override fun isModified(): Boolean {
-        return uiBoundDefaultTasks != settings.state.defaultTasks
+        return uiBoundDefaultTasks != settings.state.defaultTasks &&
+                uiBoundInlineBrowserEnabled != settings.state.inlineBrowserEnabled
     }
 
     /**
@@ -161,6 +164,7 @@ internal class SimpleJSettingsConfigurable : Configurable {
      */
     override fun apply() {
         uiBoundDefaultTasks.syncTaskStatesTo(settings.state.defaultTasks)
+        settings.state.inlineBrowserEnabled = uiBoundInlineBrowserEnabled
     }
 
     /**
@@ -169,6 +173,7 @@ internal class SimpleJSettingsConfigurable : Configurable {
      */
     override fun reset() {
         settings.state.defaultTasks.syncTaskStatesTo(uiBoundDefaultTasks)
+        uiBoundInlineBrowserEnabled = settings.state.inlineBrowserEnabled
     }
 
     private fun Set<SimpleJSettings.State.TaskState>.syncTaskStatesTo(
