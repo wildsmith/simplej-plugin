@@ -1,0 +1,10 @@
+{
+    "fileMappings": {
+        "README.md": "https://github.com/",
+        "plugin/src/main/kotlin/com/simplej/plugin/overlay/WebBrowserConfig.kt": "https://www.nytimes.com/",
+        "plugin/src/main/kotlin/com/simplej/plugin/overlay/WebBrowserOverlay.kt": "https://cnn.com",
+        "plugin/src/main/kotlin/com/simplej/plugin/overlay/WebBrowserOverlayListener.kt": "https://plugins.jetbrains.com/docs/intellij/kotlin-ui-dsl-version-2.html#cellbind",
+        "plugin/src/main/kotlin/com/simplej/plugin/overlay/FileChangeListener.kt": "https://www.droidcon.com/",
+        "plugin/src/main/kotlin/com/simplej/plugin/overlay/WebBrowserStartupActivity.kt": "https://cnn.com"
+    }
+}
