@@ -3,8 +3,6 @@ plugins {
     id("simplej.android.library")
 }
 
-simpleJ.intellijPlugin = true
-
 android {
     namespace = "com.simplej.preview"
     buildFeatures {

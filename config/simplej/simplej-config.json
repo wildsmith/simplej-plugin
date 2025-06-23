@@ -27,13 +27,13 @@
       "plugin/src/main/kotlin/com/simplej/plugin/overlay/WebBrowserStartupActivity.kt": "https://cnn.com"
     }
   },
-  "templates": [
+  "newModuleTemplates": [
     {
       "name": "SimpleJ Java Module",
       "files": [
         {
           "relativePath": "build.gradle.kts",
-          "templateLocation": "templates/simplej-java-module/build.gradle.kts"
+          "templateLocation": "simplej-java-module/build.gradle.kts"
         }
       ]
     },
@@ -42,7 +42,7 @@
       "files": [
         {
           "relativePath": "build.gradle.kts",
-          "templateLocation": "templates/java-module/build.gradle.kts"
+          "templateLocation": "java-module/build.gradle.kts"
         }
       ]
     }

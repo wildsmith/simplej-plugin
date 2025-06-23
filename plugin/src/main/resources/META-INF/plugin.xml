@@ -52,6 +52,11 @@
                 group-id="EditorPopupMenu"
                 anchor="first"/>
             <action
+                id="com.simplej.NewModuleAction"
+                class="com.simplej.plugin.actions.creation.NewModuleAction"
+                icon="AllIcons.Actions.NewFolder"
+                text="New Module"/>
+            <action
                 id="com.simplej.DeleteModuleAction"
                 class="com.simplej.plugin.actions.deletion.DeleteModuleAction"
                 icon="AllIcons.General.Delete"

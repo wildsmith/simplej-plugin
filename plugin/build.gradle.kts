@@ -15,6 +15,8 @@ simpleJ {
 }
 
 dependencies {
+    implementation(libs.compose.desktop.jvm.mac.os.arm)
+    implementation(libs.compose.material3)
     implementation(libs.compose.runtime)
     implementation(libs.kotlinx.serialization)
     intellijPlatform {

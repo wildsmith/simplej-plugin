@@ -1,14 +1,8 @@
 // Use of this source code is governed by the Apache 2.0 license.
 package com.simplej.preview
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 
 /**
@@ -23,13 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 private fun PreviewPlayground() {
     MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Play away
-        }
+        // Play away
     }
 }

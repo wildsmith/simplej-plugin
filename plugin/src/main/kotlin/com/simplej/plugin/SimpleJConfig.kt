@@ -15,12 +15,12 @@ private val jsonSerializer: Json by lazy {
 /**
  * Loads and parses the SimpleJ configuration from a JSON file.
  *
- * @param simpleJConfigFile The configuration file to load. Defaults to 'config/simplej.json' in the project's base
- * path.
+ * @param simpleJConfigFile The configuration file to load. Defaults to 'config/simplej/simplej-config.json' in the
+ * project's base path.
  * @return The parsed [SimpleJConfig] object, or null if the file doesn't exist.
  */
 internal fun Project.simpleJConfig(
-    simpleJConfigFile: File = File("$basePath/config/simplej.json")
+    simpleJConfigFile: File = File("$basePath/config/simplej/simplej-config.json")
 ): SimpleJConfig? {
     if (!simpleJConfigFile.exists()) {
         return null
@@ -41,6 +41,7 @@ internal fun Project.simpleJConfig(
 internal data class SimpleJConfig(
     val workspaceCompat: WorkspaceCompat? = null,
     val webBrowserMappings: WebBrowserMappings? = null,
+    val newModuleTemplates: List<NewModuleTemplate>? = null,
 )
 
 /**
@@ -164,4 +165,20 @@ internal data class WebBrowserMappings(
         val relativePath = filePath.substringAfter(projectPath).removePrefix("/")
         return fileMappings?.get(relativePath)
     }
+}
+
+@Serializable
+internal data class NewModuleTemplate(
+    val name: String,
+    val files: List<NewFileTemplate>,
+)
+
+@Serializable
+internal data class NewFileTemplate(
+    val relativePath: String,
+    val templateLocation: String,
+) {
+
+    fun template(basePath: String): File =
+        File("$basePath/config/simplej/templates/$templateLocation")
 }

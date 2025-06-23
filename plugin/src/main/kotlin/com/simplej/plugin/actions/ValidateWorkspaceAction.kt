@@ -36,7 +36,7 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return event.showError("No valid project found within the workspace.")
         val simpleJConfig = project.simpleJConfig() ?: return event.showError(
-            "No valid `simplej.json` configuration file found within `${project.basePath}/config/`!"
+            "No valid `simplej-config.json` configuration file found within `${project.basePath}/config/simplej`!"
         )
         validateJava(project, simpleJConfig)
         validateSshConnection(project, simpleJConfig)
