@@ -21,6 +21,18 @@ import com.simplej.base.extensions.toVirtualFile
 import com.simplej.plugin.actions.github.LookupCodeOwnerAction.CodeOwnerIdentifier
 import com.simplej.plugin.simpleJConfig
 
+/**
+ * Action that facilitates the creation of a new module within the project.
+ *
+ * This action orchestrates the entire process of scaffolding a new module. It handles:
+ * - Creating the module's directory structure.
+ * - Updating the Gradle `settings.gradle.kts` file to include the new module.
+ * - Updating the `CODEOWNERS` file to assign ownership.
+ * - Refreshing the Virtual File System (VFS) to reflect the changes.
+ * - Triggering a Gradle sync to integrate the new module into the IDE and build process.
+ *
+ * It typically gathers the required module information from the user through a dialog.
+ */
 internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
 
     /**
@@ -62,6 +74,18 @@ internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         }
     }
 
+    /**
+     * Orchestrates the creation of a new module by executing all necessary file modifications
+     * and system commands within a single, undoable `WriteCommandAction`.
+     *
+     * This function handles the core logic of the [NewModuleAction].
+     *
+     * @param event The action event, used here to trigger a post-creation Gradle sync.
+     * @param project The current project where the module will be created.
+     * @param projectFile The virtual file representing the project, used as an anchor to find other configuration
+     *                    files.
+     * @param formData A data object containing the configuration for the new module (e.g., its name and owner).
+     */
     private fun createNewModule(
         event: AnActionEvent,
         project: Project,

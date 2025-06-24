@@ -36,7 +36,7 @@
             id="com.simplej.plugin.actions.settings.SimpleJSettingsConfigurable"
             displayName="SimpleJ"/>
         <editorFactoryListener implementation="com.simplej.plugin.overlay.WebBrowserOverlayListener"/>
-        <postStartupActivity implementation="com.simplej.plugin.overlay.WebBrowserStartupActivity"/>
+        <backgroundPostStartupActivity implementation="com.simplej.plugin.overlay.WebBrowserStartupActivity"/>
     </extensions>
 
     <actions>

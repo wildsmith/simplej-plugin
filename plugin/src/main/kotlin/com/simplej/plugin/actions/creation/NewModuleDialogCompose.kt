@@ -25,6 +25,18 @@ import com.simplej.plugin.SimpleJConfig
 import com.simplej.plugin.simpleJConfig
 import javax.swing.JComponent
 
+/**
+ * A dialog window that prompts the user for new module information, built with Compose Desktop.
+ *
+ * This class demonstrates how to integrate a modern, declarative UI created with Compose
+ * into the IntelliJ Platform's traditional Swing-based dialog system. It wraps the
+ * composable content inside a `DialogWrapper`.
+ *
+ * @param project The current IntelliJ project.
+ * @param formData The data object to bind to the UI fields and store user input.
+ * @param okCallback A lambda function executed with the final [NewModuleFormData] when the
+ *                   user confirms the dialog.
+ */
 internal class NewModuleDialogCompose(
     private val project: Project,
     private val formData: NewModuleFormData = NewModuleFormData(),
@@ -42,6 +54,14 @@ internal class NewModuleDialogCompose(
         init()
     }
 
+    /**
+     * Creates the center panel of the dialog by embedding a Composable.
+     *
+     * This method returns a [ComposePanel], which acts as a bridge between Swing and Compose,
+     * allowing the [NewModuleDialogContent] composable to be rendered inside the dialog.
+     *
+     * @return A [JComponent] containing the Compose-based UI.
+     */
     override fun createCenterPanel(): JComponent {
         return ComposePanel().apply {
             setContent {
@@ -55,12 +75,26 @@ internal class NewModuleDialogCompose(
         }
     }
 
+    /**
+     * Handles the user clicking the "OK" button.
+     *
+     * It invokes the [okCallback] with the populated [formData] and then closes the dialog.
+     */
     override fun doOKAction() {
         okCallback(formData)
         super.doOKAction()
     }
 }
 
+/**
+ * The main composable function that defines the UI for the new module dialog.
+ *
+ * This function is self-contained and declaratively builds the form fields for the module name,
+ * owner, and a list of templates. It is stateless, with its state managed by the [formData] object.
+ *
+ * @param templates A list of template names to be displayed as radio button options.
+ * @param formData The state object holding the user's input.
+ */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @Composable
 fun NewModuleDialogContent(
@@ -72,6 +106,12 @@ fun NewModuleDialogContent(
             value = formData.moduleName,
             onValueChange = { formData.moduleName = it },
             label = { Text("Module name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        OutlinedTextField(
+            value = formData.githubTeamOrUser,
+            onValueChange = { formData.githubTeamOrUser = it },
+            label = { Text("Github team or user") },
             modifier = Modifier.fillMaxWidth()
         )
         templates.forEach { template ->
