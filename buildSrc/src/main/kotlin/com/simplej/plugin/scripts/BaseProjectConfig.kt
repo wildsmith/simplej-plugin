@@ -33,10 +33,22 @@ internal fun Project.configureBaseProject(simpleJOptions: SimpleJOptions) {
         mavenCentral()
         google()
     }
+    loadLocalProperties()
     configureCheckstyle()
     configureLint(simpleJOptions)
     configureDetekt()
     configureTestTasks()
+}
+
+private fun Project.loadLocalProperties() {
+    val localProperties = rootProject.file("local.properties")
+    if (localProperties.exists()) {
+        val properties = java.util.Properties()
+        localProperties.inputStream().use { properties.load(it) }
+        properties.forEach { (name, value) ->
+            extensions.extraProperties[name.toString()] = value
+        }
+    }
 }
 
 private fun Project.configureCheckstyle() {

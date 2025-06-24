@@ -1,6 +1,6 @@
 <idea-plugin url="https://docs.sonarsource.com/sonarlint/intellij/">
     <id>com.simplej</id>
-    <name>SimpleJ</name>
+    <name>SimpleJ Teaching Aid</name>
     <version>${project.version}</version>
     <vendor url="https://github.com/wildsmith/simplej-plugin">Github Project</vendor>
 
@@ -8,6 +8,24 @@
         <html>
             <p>
                 A simple IntelliJ IDEA Plugin for teaching purposes and performing basic engineering tasks.
+            </p>
+            <p>
+                SimpleJ should not be viewed as a utility in and of itself but rather a mechanism to inspire ideas for better DevEx while providing code samples.
+            </p>
+            <p>
+                Functionality currently offered includes...
+                <ul>
+                    <li>Configurable <code>json</code> attributes for workspace validation, new module templates and browser overlays</li>
+                    <li>*Some* customization of the Plugin through the Settings panel</li>
+                    <li>New module creation using templates specified within <code>simplej-config.json</code></li>
+                    <li>Safe module deletion, plus removal of any entries within CODEOWNERS</li>
+                    <li>Location-aware Gradle Task execution</li>
+                    <li>Open a file and/or file line range within Github</li>
+                    <li>Copying the Github link for the current file and/or file line range</li>
+                    <li>Code owner lookup for the current file/directory</li>
+                    <li>Workspace validation (ssh, java version/home, Android build tools) based on the values defined within <code>simplej-config.json</code></li>
+                    <li>Nest IDE browser overlay based on the values defined within <code>simplej-config.json</code></li>
+                </ul>
             </p>
             <p>
                 Clone the project from <a href="https://github.com/wildsmith/simplej-plugin">Github</a> or download SimpleJ from the Plugin Marketplace.

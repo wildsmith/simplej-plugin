@@ -53,6 +53,14 @@ internal fun Project.configureIntelliJPlugin() {
                 }
             }
             buildSearchableOptions.set(false)
+            publishing {
+                token.set(provider { properties.getOrDefault("PUBLISH_TOKEN", "").toString() })
+            }
+            signing {
+                password.set(provider { properties.getOrDefault("PRIVATE_KEY_PASSWORD", "").toString() })
+                privateKeyFile.set(layout.projectDirectory.file("config/signing/private.pem"))
+                certificateChainFile.set(layout.projectDirectory.file("config/signing/chain.crt"))
+            }
         }
         configureArtifactTasks()
     }
