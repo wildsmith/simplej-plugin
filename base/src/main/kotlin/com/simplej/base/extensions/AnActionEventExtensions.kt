@@ -3,9 +3,11 @@ package com.simplej.base.extensions
 
 import androidx.annotation.RestrictTo
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
+import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
+import org.jetbrains.plugins.gradle.util.GradleConstants
 import java.io.File
 
 /**
@@ -54,14 +56,19 @@ fun AnActionEvent.openInIde(file: File, line: Int? = null) =
 /**
  * Synchronizes the Gradle project in the IDE.
  *
- * This extension function attempts to refresh/sync the Gradle project by:
- * 1. Trying to execute the "Gradle.RefreshAllProjects" action...
- * 2. If that's not available, falling back to "Android.SyncProject" action
+ * This extension function attempts to refresh/sync the Gradle project.
  *
  * This is useful when programmatic changes require the Gradle project to be resynced to reflect the updates in the IDE.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun AnActionEvent.gradleSync() {
-    ActionManager.getInstance().getAction("Gradle.RefreshAllProjects")?.actionPerformed(this)
-        ?: ActionManager.getInstance().getAction("Android.SyncProject")?.actionPerformed(this)
+    val project = project ?: return
+    val rootProjectFile = getRootProjectFile(project) ?: return
+    ExternalSystemUtil.refreshProject(
+        project,
+        GradleConstants.SYSTEM_ID,
+        rootProjectFile.path,
+        false,
+        ProgressExecutionMode.IN_BACKGROUND_ASYNC
+    )
 }

@@ -37,6 +37,8 @@
     <change-notes><![CDATA[
       <ul>
         <li>1.0 - Initial distribution with basic Gradle Task interactions and settings</li>
+        <li>1.0.1 - Bumping the intellij release version to improve compatability</li>
+        <li>1.0.2 - Addressing issues that were flagged by the Marketplace</li>
       </ul>
       ]]>
     </change-notes>

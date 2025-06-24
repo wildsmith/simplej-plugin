@@ -94,31 +94,4 @@ internal class AnActionEventExtensionsTests {
             )
         }
     }
-
-    @Test
-    fun `gradleSync executes Gradle refresh action when available`() {
-        val refreshAction = mockk<AnAction>()
-        every { actionManager.getAction("Gradle.RefreshAllProjects") } returns refreshAction
-        every { refreshAction.actionPerformed(event) } just runs
-
-        event.gradleSync()
-
-        verify {
-            refreshAction.actionPerformed(event)
-        }
-    }
-
-    @Test
-    fun `gradleSync falls back to Android sync when Gradle refresh is not available`() {
-        val androidSyncAction = mockk<AnAction>()
-        every { actionManager.getAction("Gradle.RefreshAllProjects") } returns null
-        every { actionManager.getAction("Android.SyncProject") } returns androidSyncAction
-        every { androidSyncAction.actionPerformed(event) } just runs
-
-        event.gradleSync()
-
-        verify {
-            androidSyncAction.actionPerformed(event)
-        }
-    }
 }

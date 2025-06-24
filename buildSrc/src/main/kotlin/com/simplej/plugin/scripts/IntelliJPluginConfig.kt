@@ -106,7 +106,7 @@ private fun Project.setProjetVersion(artifactDir: String, projectName: String?) 
         it.name.startsWith("$projectName-") && it.name.endsWith(ZIP_SUFFIX)
     }
     if (existingArtifact == null) {
-        version = "0.0.1"
+        version = "1.0.2"
     } else {
         val oldVersion = existingArtifact.name
             .substringBefore(ZIP_SUFFIX)
