@@ -24,7 +24,7 @@
                     <li>Copying the Github link for the current file and/or file line range</li>
                     <li>Code owner lookup for the current file/directory</li>
                     <li>Workspace validation (ssh, java version/home, Android build tools) based on the values defined within <code>simplej-config.json</code></li>
-                    <li>Nest IDE browser overlay based on the values defined within <code>simplej-config.json</code></li>
+                    <li>Nested IDE browser overlay based on the values defined within <code>simplej-config.json</code></li>
                 </ul>
             </p>
             <p>
