@@ -51,7 +51,7 @@ internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
             return false
         }
         val currentFile = event.currentFile ?: return false
-        return currentFile.findAllProjectRoots(project)
+        return findAllProjectRoots(project)
             .any { it.path.startsWith(currentFile.path) }
     }
 
@@ -97,7 +97,7 @@ internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         null,
         {
             val newModuleDir = createNewModule(project, projectFile, formData)
-            val rootProjectFile = projectFile.getRootProjectFile(project)!!
+            val rootProjectFile = getRootProjectFile(project)!!
             updateSettings(project, rootProjectFile, newModuleDir)
             updateCodeOwners(project, rootProjectFile, newModuleDir, formData)
 
@@ -114,10 +114,31 @@ internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         val newModuleDir = projectFile.createChildDirectory(this, formData.formattedModuleName())
         val simpleJConfig = project.simpleJConfig()
         simpleJConfig!!.newModuleTemplates!!.first { it.name == formData.templateName }.files.forEach { file ->
-            newModuleDir.createChildData(this, file.relativePath)
+            var fileDir = newModuleDir
+            if (file.relativePath.contains("/")) {
+                fileDir = createChildDirectoryRecursively(
+                    newModuleDir,
+                    file.relativePath
+                        .substringBeforeLast("/")
+                        .split("/")
+                )
+            }
+            fileDir.createChildData(this, file.relativePath.substringAfterLast("/"))
                 .writeText(file.template(project.basePath!!).readText())
         }
         return newModuleDir
+    }
+
+    private fun createChildDirectoryRecursively(
+        parentDir: VirtualFile,
+        pathSegments: List<String>
+    ): VirtualFile {
+        return if (pathSegments.isEmpty()) {
+            parentDir
+        } else {
+            val fileDir = parentDir.createChildDirectory(this, pathSegments.first())
+            return createChildDirectoryRecursively(fileDir, pathSegments.drop(1))
+        }
     }
 
     private fun updateSettings(

@@ -62,7 +62,7 @@ internal class DeleteModuleActionTests {
         every { project.name } returns "testProject"
         every { projectFile.path } returns "/test/path/module"
         every { rootProjectFile.path } returns "/test/path"
-        every { projectFile.getRootProjectFile(any()) } returns rootProjectFile
+        every { getRootProjectFile(any()) } returns rootProjectFile
         every { projectFile.getGradlePath(any()) } returns ":module"
         every { rootProjectFile.getSettingsFile() } returns settingsFile
         every { rootProjectFile.getCodeOwnersFile() } returns codeOwnersFile
@@ -110,7 +110,7 @@ internal class DeleteModuleActionTests {
             }
         """.trimIndent()
 
-        every { projectFile.findAllProjectRoots(project) } returns setOf(rootProjectFile)
+        every { findAllProjectRoots(project) } returns setOf(rootProjectFile)
         every { rootProjectFile.getBuildFile() } returns buildFile
         every { buildFile.useLines(any(), any<(Sequence<String>) -> Boolean>()) } answers {
             firstArg<(Sequence<String>) -> Boolean>().invoke(buildFileContent.lineSequence())

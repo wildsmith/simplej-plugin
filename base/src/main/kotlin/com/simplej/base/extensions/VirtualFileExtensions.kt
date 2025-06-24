@@ -54,7 +54,7 @@ fun File.toVirtualFile(): VirtualFile? =
  * @return The root [VirtualFile] with the shortest path length, or null if no root is found
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-fun VirtualFile.getRootProjectFile(project: Project): VirtualFile? =
+fun getRootProjectFile(project: Project): VirtualFile? =
     findAllProjectRoots(project).minByOrNull { it.path.length }
 
 /**
@@ -69,11 +69,11 @@ fun VirtualFile.getRootProjectFile(project: Project): VirtualFile? =
  * @return Set of [VirtualFile]s representing all valid Gradle project roots
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-fun VirtualFile.findAllProjectRoots(project: Project): Set<VirtualFile> =
+fun findAllProjectRoots(project: Project): Set<VirtualFile> =
     ProjectRootManager.getInstance(project).contentRoots
-        .filterTo(mutableSetOf()) {
-            name != "buildSrc" && it.getBuildFile().exists()
-        }
+        .filterTo(mutableSetOf()) { it.name != "buildSrc" && it.getBuildFile().exists() }
+        .sortedBy { it.path }
+        .toSet()
 
 /**
  * Finds the closest Gradle project root directory containing the current virtual file.
@@ -86,11 +86,30 @@ fun VirtualFile.findAllProjectRoots(project: Project): Set<VirtualFile> =
  * @return The closest [VirtualFile] representing a Gradle project root, or null if none found
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-fun VirtualFile.findClosestProject(project: Project): VirtualFile? =
-    findAllProjectRoots(project)
+fun VirtualFile.findClosestProject(project: Project): VirtualFile? {
+    val allProjectRoots = findAllProjectRoots(project)
+    val rootProjectFile = getRootProjectFile(project)!!
+    val rootProjectPath = rootProjectFile.path
+    val transformedProjectRoots = mutableSetOf<VirtualFile>()
+    transformedProjectRoots.add(rootProjectFile)
+    for (projectRoot in allProjectRoots) {
+        val pathSegments = projectRoot.path
+            .substringAfter(rootProjectPath)
+            .split("/")
+            .filterNot { it.isBlank() }
+        var previousPath: String = rootProjectPath
+        pathSegments.forEach {
+            previousPath = "$previousPath/$it"
+            transformedProjectRoots.add(
+                LocalFileSystem.getInstance().findFileByPath(previousPath)!!
+            )
+        }
+    }
+    return transformedProjectRoots
         .sortedBy { it.path.length }
         .reversed()
         .firstOrNull { path.startsWith(it.path) }
+}
 
 /**
  * Locates and returns the Gradle build file (build.gradle.kts or build.gradle) in the current directory.

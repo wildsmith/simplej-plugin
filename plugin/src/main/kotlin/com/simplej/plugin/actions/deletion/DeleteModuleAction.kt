@@ -48,7 +48,7 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
         val projectFile = event.currentFile?.findClosestProject(project)
             ?: return super.shouldShow(event, project)
-        val rootProjectFile = projectFile.getRootProjectFile(project)
+        val rootProjectFile = getRootProjectFile(project)
             ?: return super.shouldShow(event, project)
         return projectFile.path != rootProjectFile.path
     }
@@ -79,7 +79,7 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
     @VisibleForTesting
     internal fun checkForBuildFileReferences(projectFile: VirtualFile, project: Project): Set<CodeReference> {
         val shorthandProjectPath = projectFile.getGradlePath(project)
-        val projectRoots = projectFile.findAllProjectRoots(project)
+        val projectRoots = findAllProjectRoots(project)
         val references = mutableSetOf<CodeReference>()
         for (projectRoot in projectRoots) {
             var withinDependenciesBlock = false
@@ -141,7 +141,7 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
     ): (() -> Unit)? {
         val shorthandProjectPath = projectFile.getGradlePath(project)
         val fileLines = StringBuilder()
-        val settingsFile = projectFile.getRootProjectFile(project)?.getSettingsFile() ?: return null
+        val settingsFile = getRootProjectFile(project)?.getSettingsFile() ?: return null
         settingsFile.useLines { lines ->
             for (line in lines) {
                 val trimmedLine = line.trim()
@@ -171,7 +171,7 @@ internal class DeleteModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem 
 
     @VisibleForTesting
     internal fun updateCodeOwners(currentFile: VirtualFile, project: Project): (() -> Unit)? {
-        val rootProjectFile = currentFile.getRootProjectFile(project) ?: return null
+        val rootProjectFile = getRootProjectFile(project) ?: return null
         val currentFilePathSegments = currentFile.path.substringAfter(rootProjectFile.path)
             .split("/")
             .drop(1)

@@ -40,7 +40,7 @@ internal class LookupCodeOwnerAction : GithubTrackedCodeAction() {
         if (event.currentFiles.size != 1) {
             return false
         }
-        val rootProjectFile = event.currentFile?.getRootProjectFile(project) ?: return false
+        val rootProjectFile = getRootProjectFile(project) ?: return false
         return rootProjectFile.getCodeOwnersFile().exists()
     }
 
@@ -52,7 +52,7 @@ internal class LookupCodeOwnerAction : GithubTrackedCodeAction() {
         val project = event.project ?: return event.showError(
             "No valid project found within the workspace."
         )
-        val rootProjectFile = currentFile.getRootProjectFile(project) ?: return event.showError(
+        val rootProjectFile = getRootProjectFile(project) ?: return event.showError(
             "No valid project found within the workspace."
         )
 

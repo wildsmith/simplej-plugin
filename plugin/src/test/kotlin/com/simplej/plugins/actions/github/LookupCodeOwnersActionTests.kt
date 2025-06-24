@@ -71,7 +71,7 @@ internal class LookupCodeOwnersActionTests {
         every { event.currentFile } returns currentFile
         every { project.name } returns "testProject"
         every { currentFile.path } returns "/test/path/file.kt"
-        every { currentFile.getRootProjectFile(any()) } returns rootProjectFile
+        every { getRootProjectFile(any()) } returns rootProjectFile
 
         mockkStatic(CopyPasteManager::class)
         every { CopyPasteManager.getInstance() } returns copyPasteManager
@@ -136,7 +136,7 @@ internal class LookupCodeOwnersActionTests {
 
     @Test
     fun `actionPerformed shows error when no root project file`() {
-        every { currentFile.getRootProjectFile(any()) } returns null
+        every { getRootProjectFile(any()) } returns null
 
         action.actionPerformed(event)
 
