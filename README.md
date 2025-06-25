@@ -2,7 +2,7 @@
 
 A simple IntelliJ IDEA Plugin for teaching purposes and performing basic engineering tasks.
 
-![Logo](logo.svg)
+<img src="https://raw.githubusercontent.com/wildsmith/simplej-plugin/refs/heads/main/logo.svg" alt="SimpleJ Logo" width="150">
 
 SimpleJ should not be viewed as a utility in and of itself but rather a mechanism to inspire ideas for better DevEx while providing code samples.
 
@@ -24,7 +24,7 @@ Functionality currently offered includes...
 
 ## Install
 
-SimpleJ is available on the Plugin Marketplace by searching for 'SimpleJ' and can be installed locally by 
+SimpleJ is available on the [Plugin Marketplace](https://plugins.jetbrains.com/plugin/27739-simplej-teaching-aid) and can be installed locally by 
 downloading the `artifact.zip` located [here](https://github.com/wildsmith/simplej-plugin/blob/main/artifact/plugin-1.0.2.zip).
 
 ## License
