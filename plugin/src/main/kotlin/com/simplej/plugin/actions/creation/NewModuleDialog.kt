@@ -26,13 +26,10 @@ import com.simplej.plugin.simpleJConfig
  */
 internal class NewModuleDialog(
     private val project: Project,
+    private val simpleJConfig: SimpleJConfig,
     private val formData: NewModuleFormData = NewModuleFormData(),
     private val okCallback: (NewModuleFormData) -> Unit,
 ) : DialogWrapper(project, true) {
-
-    private val simpleJConfig: SimpleJConfig by lazy {
-        project.simpleJConfig()!!
-    }
 
     init {
         title = "Create New Module"

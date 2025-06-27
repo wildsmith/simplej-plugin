@@ -18,6 +18,7 @@ import com.simplej.base.extensions.getSettingsFile
 import com.simplej.base.extensions.gradleSync
 import com.simplej.base.extensions.showError
 import com.simplej.base.extensions.toVirtualFile
+import com.simplej.plugin.SimpleJConfig
 import com.simplej.plugin.actions.github.LookupCodeOwnerAction.CodeOwnerIdentifier
 import com.simplej.plugin.simpleJConfig
 
@@ -45,18 +46,21 @@ internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
      * @param project The current project
      * @return true if the action should be shown, false otherwise
      */
-    @Suppress("ReturnCount")
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
-        if (project.simpleJConfig()?.newModuleTemplates?.isEmpty() == true) {
-            return false
-        }
         val currentFile = event.currentFile ?: return false
         return findAllProjectRoots(project)
             .any { it.path.startsWith(currentFile.path) }
     }
 
+    @Suppress("ReturnCount")
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return event.showError("No valid project found within the workspace.")
+        val simpleJConfig = project.simpleJConfig() ?: return event.showError(
+            "No valid `simplej-config.json` configuration file found within `${project.basePath}/config/simplej`!"
+        )
+        if (simpleJConfig.newModuleTemplates.isNullOrEmpty()) return event.showError(
+            "No new module templates listed within `simplej-config.json`!"
+        )
         val projectFile = event.currentFile?.findClosestProject(project) ?: return event.showError(
             "No valid project found within the workspace."
         )
@@ -64,12 +68,12 @@ internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         // To view the Compose dialog, set this to false
         val useSwingDialog = true
         if (useSwingDialog) {
-            NewModuleDialog(project) { formData ->
-                createNewModule(event, project, projectFile, formData)
+            NewModuleDialog(project, simpleJConfig) { formData ->
+                createNewModule(event, project, projectFile, simpleJConfig, formData)
             }.show()
         } else {
-            NewModuleDialogCompose(project) { formData ->
-                createNewModule(event, project, projectFile, formData)
+            NewModuleDialogCompose(project, simpleJConfig) { formData ->
+                createNewModule(event, project, projectFile, simpleJConfig, formData)
             }.show()
         }
     }
@@ -90,13 +94,14 @@ internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
         event: AnActionEvent,
         project: Project,
         projectFile: VirtualFile,
+        simpleJConfig: SimpleJConfig,
         formData: NewModuleFormData
     ) = WriteCommandAction.runWriteCommandAction(
         project,
         "New Module",
         null,
         {
-            val newModuleDir = createNewModule(project, projectFile, formData)
+            val newModuleDir = createNewModule(project, projectFile, simpleJConfig, formData)
             val rootProjectFile = getRootProjectFile(project)!!
             updateSettings(project, rootProjectFile, newModuleDir)
             updateCodeOwners(project, rootProjectFile, newModuleDir, formData)
@@ -109,11 +114,11 @@ internal class NewModuleAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
     private fun createNewModule(
         project: Project,
         projectFile: VirtualFile,
+        simpleJConfig: SimpleJConfig,
         formData: NewModuleFormData
     ): VirtualFile {
         val newModuleDir = projectFile.createChildDirectory(this, formData.formattedModuleName())
-        val simpleJConfig = project.simpleJConfig()
-        simpleJConfig!!.newModuleTemplates!!.first { it.name == formData.templateName }.files.forEach { file ->
+        simpleJConfig.newModuleTemplates!!.first { it.name == formData.templateName }.files.forEach { file ->
             var fileDir = newModuleDir
             if (file.relativePath.contains("/")) {
                 fileDir = createChildDirectoryRecursively(

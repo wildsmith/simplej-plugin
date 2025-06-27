@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.simplej.plugin.SimpleJConfig
-import com.simplej.plugin.simpleJConfig
 import javax.swing.JComponent
 
 /**
@@ -39,13 +38,10 @@ import javax.swing.JComponent
  */
 internal class NewModuleDialogCompose(
     private val project: Project,
+    private val simpleJConfig: SimpleJConfig,
     private val formData: NewModuleFormData = NewModuleFormData(),
     private val okCallback: (NewModuleFormData) -> Unit,
 ) : DialogWrapper(project, true) {
-
-    private val simpleJConfig: SimpleJConfig by lazy {
-        project.simpleJConfig()!!
-    }
 
     init {
         title = "Create New Module"
