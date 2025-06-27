@@ -32,7 +32,6 @@ internal abstract class GithubTrackedCodeAction : SimpleJAnAction(), ProjectView
 @VisibleForTesting
 internal fun Project.getGithubUrl(
     editor: Editor?,
-    projectFile: VirtualFile,
     currentFile: VirtualFile
 ): String? {
     var linePath = ""
@@ -48,7 +47,7 @@ internal fun Project.getGithubUrl(
             "#L$startLine"
         }
     }
-    val repo = GitUtil.getRepositoryForFile(this, projectFile)
+    val repo = GitUtil.getRepositoryForFile(this, currentFile)
     val remoteUrl = repo
         .remotes
         .firstOrNull { it.name == "origin" }
@@ -60,7 +59,12 @@ internal fun Project.getGithubUrl(
     return if (remoteUrl != null) {
         val lastSegment = remoteUrl.substringAfterLast("/")
         val pathSegment = currentFile.path.substringAfterLast(lastSegment)
-        "https://$remoteUrl/blob/${repo.currentBranchName}$pathSegment$linePath"
+        val render = if (currentFile.isDirectory) {
+            "tree"
+        } else {
+            "blob"
+        }
+        "https://$remoteUrl/$render/${repo.currentBranchName}$pathSegment$linePath"
     } else {
         null
     }
