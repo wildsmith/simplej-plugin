@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.simplej.base.extensions.currentFiles
 import com.simplej.base.extensions.executeBackgroundTask
-import com.simplej.base.extensions.findClosestProject
 import com.simplej.base.extensions.showError
 
 /**
@@ -42,17 +41,14 @@ internal class OpenInGithubAction : GithubTrackedCodeAction() {
         }
 
         currentFiles.forEach { currentFile ->
-            val projectFile = currentFile.findClosestProject(project) ?: return event.showError(
-                "No valid project found within the workspace."
-            )
             val editor = event.getData(PlatformDataKeys.EDITOR)
-            project.openInBrowser(projectFile, currentFile, editor)
+            project.openInBrowser(currentFile, editor)
         }
     }
 
-    private fun Project.openInBrowser(projectFile: VirtualFile, currentFile: VirtualFile, editor: Editor? = null) {
+    private fun Project.openInBrowser(currentFile: VirtualFile, editor: Editor? = null) {
         executeBackgroundTask {
-            getGithubUrl(editor, projectFile, currentFile)?.let {
+            getGithubUrl(editor, currentFile)?.let {
                 com.simplej.base.extensions.openInBrowser(it)
             }
         }

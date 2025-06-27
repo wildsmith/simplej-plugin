@@ -19,6 +19,7 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformExtension
+import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformTestingExtension
 
 /**
  * Extension property to access the source sets configuration of a Gradle project.
@@ -155,6 +156,14 @@ internal fun DependencyHandlerScope.intellijPlatform(configuration: IntelliJPlat
  */
 internal fun Project.intellijPlatform(configuration: IntelliJPlatformExtension.() -> Unit) =
     configuration(extensions["intellijPlatform"] as IntelliJPlatformExtension)
+
+/**
+ * Configures IntelliJ Platform-specific testing settings for the project.
+ *
+ * @param configuration Lambda with IntelliJ Platform Test configuration block
+ */
+internal fun Project.intellijPlatformTesting(configuration: IntelliJPlatformTestingExtension.() -> Unit) =
+    configuration(extensions["intellijPlatformTesting"] as IntelliJPlatformTestingExtension)
 
 /**
  * Configures Detekt static code analysis settings for the project.

@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project
 import com.simplej.base.extensions.currentFile
 import com.simplej.base.extensions.currentFiles
 import com.simplej.base.extensions.executeBackgroundTask
-import com.simplej.base.extensions.findClosestProject
 import com.simplej.base.extensions.showError
 import java.awt.datatransfer.StringSelection
 
@@ -63,13 +62,10 @@ internal class CopyGithubLinkAction : GithubTrackedCodeAction() {
         val currentFile = event.currentFile ?: return event.showError(
             "No valid file found within the project workspace."
         )
-        val projectFile = currentFile.findClosestProject(project) ?: return event.showError(
-            "No valid project found within the workspace."
-        )
 
         val editor = event.getData(PlatformDataKeys.EDITOR)
         executeBackgroundTask {
-            project.getGithubUrl(editor, projectFile, currentFile)?.let {
+            project.getGithubUrl(editor, currentFile)?.let {
                 val copyPasteManager = CopyPasteManager.getInstance()
                 copyPasteManager.setContents(StringSelection(it))
             }

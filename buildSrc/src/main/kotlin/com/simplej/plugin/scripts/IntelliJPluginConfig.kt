@@ -6,7 +6,9 @@ import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Delete
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.repositories
+import org.gradle.process.CommandLineArgumentProvider
 import java.io.File
 
 /**
@@ -41,6 +43,19 @@ internal fun Project.configureIntelliJPlugin() {
         intellijPlatform {
             bundledPlugins("com.intellij.gradle", "com.intellij.java", "Git4Idea")
             intellijIdeaCommunity(getIntelliJReleaseVersion())
+        }
+    }
+
+    intellijPlatformTesting {
+        runIde.registering {
+            task {
+                jvmArgumentProviders += CommandLineArgumentProvider {
+                    listOf(
+                        "-Xmx8g",
+                        "-Dkotlin.daemon.jvm.options=-XX:MaxMetaspaceSize=1g"
+                    )
+                }
+            }
         }
     }
 
