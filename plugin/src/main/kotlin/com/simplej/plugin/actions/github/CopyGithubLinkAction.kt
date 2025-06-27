@@ -51,7 +51,7 @@ import java.awt.datatransfer.StringSelection
 internal class CopyGithubLinkAction : GithubTrackedCodeAction() {
 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
-        return event.currentFiles.size == 1
+        return super.shouldShow(event, project) && event.currentFiles.size == 1
     }
 
     @Suppress("ReturnCount")
