@@ -128,12 +128,12 @@ private fun Project.setProjetVersion(artifactDir: String, projectName: String?) 
             .substringAfter("-")
         var index = 0
         version = oldVersion.split(".").joinToString(".") {
-            if (index == 2) {
+            index++
+            if (index == 3) {
                 "${it.toInt() + 1}"
             } else {
                 it
             }
-            index++
         }
     }
 }
