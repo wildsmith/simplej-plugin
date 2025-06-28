@@ -20,7 +20,7 @@ private val jsonSerializer: Json by lazy {
  * @return The parsed [SimpleJConfig] object, or null if the file doesn't exist.
  */
 internal fun Project.simpleJConfig(
-    simpleJConfigFile: File = File("$basePath/config/simplej/simplej-config.json")
+    simpleJConfigFile: File = getSimpleJFile()
 ): SimpleJConfig? {
     if (!simpleJConfigFile.exists()) {
         return null
@@ -31,6 +31,16 @@ internal fun Project.simpleJConfig(
         jsonSerializer.decodeFromStream<SimpleJConfig>(it)
     }
 }
+
+/**
+ * Returns the `simplej-config.json` [File]
+ *
+ * Note: this file may or may not exist, it's best to check its existence before performing any actions.
+ *
+ * @return the `simplej-config.json` [File]
+ */
+internal fun Project.getSimpleJFile() =
+    File("$basePath/config/simplej/simplej-config.json")
 
 /**
  * Root configuration class for SimpleJ plugin settings.

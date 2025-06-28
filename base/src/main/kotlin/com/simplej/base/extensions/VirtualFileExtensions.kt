@@ -175,3 +175,29 @@ fun VirtualFile.getGradlePath(project: Project): String =
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun File?.exists(): Boolean = this != null && exists()
+
+/**
+ * Gets a child directory with the specified [directoryName], or creates it if it does not already exist.
+ *
+ * This function first attempts to find a child directory of the current [VirtualFile] with the given [directoryName].
+ * If the directory is found, it is returned. Otherwise, a new directory is created with that name.
+ *
+ * @param directoryName The name of the directory to get or create.
+ * @return The [VirtualFile] representing the existing or newly created directory.
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun VirtualFile.createDirOrGet(directoryName: String) =
+    findChild(directoryName) ?: createChildDirectory("SimpleJ", directoryName)
+
+/**
+ * Gets a child file with the specified [fileName], or creates it if it does not already exist.
+ *
+ * This function first attempts to find a child file of the current [VirtualFile] with the given [fileName].
+ * If the file is found, it is returned. Otherwise, a new file is created with that name.
+ *
+ * @param fileName The name of the file to get or create.
+ * @return The [VirtualFile] representing the existing or newly created file.
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun VirtualFile.createChildOrGet(fileName: String) =
+    findChild(fileName) ?: createChildData("SimpleJ", fileName)

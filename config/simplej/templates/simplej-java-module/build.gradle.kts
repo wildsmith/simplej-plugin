@@ -3,6 +3,4 @@ plugins {
     id("org.jetbrains.intellij.platform.module")
 }
 
-simpleJ {
-    intellijPlugin = true
-}
+simpleJ.intellijPlugin = true

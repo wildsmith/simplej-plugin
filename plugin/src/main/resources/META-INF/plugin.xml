@@ -163,6 +163,11 @@
                 icon="AllIcons.General.GreenCheckmark"
                 text="Validate Workspace"/>
             <action
+                id="com.simplej.plugin.actions.GenerateSimpleJConfigAction"
+                class="com.simplej.plugin.actions.GenerateSimpleJConfigAction"
+                icon="AllIcons.FileTypes.Json"
+                text="Generate SimpleJ Config"/>
+            <action
                 id="com.simplej.OpenSettingsAction"
                 class="com.simplej.plugin.actions.settings.OpenSettingsAction"
                 icon="AllIcons.General.Settings"
