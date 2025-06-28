@@ -67,7 +67,21 @@ internal class SimpleJSettingsConfigurable : Configurable {
                                 if (!ssh.testRepo.isNullOrBlank()) {
                                     row("SSH test repo:") {
                                         customTextField(ssh.testRepo)
-                                        rowComment("This endpoint will be used to validate proper SSH configuration.")
+                                        rowComment("The endpoint used to validate proper SSH configuration.")
+                                    }
+                                }
+                                if (!ssh.keyPath.isNullOrBlank()) {
+                                    row("SSH key path:") {
+                                        customTextField(ssh.keyPath)
+                                        rowComment(
+                                            "This path is relative to the system property <code>user.home</code>."
+                                        )
+                                    }
+                                }
+                                if (ssh.passphraseEnabled != null) {
+                                    row("SSH passphrase enabled:") {
+                                        customTextField(ssh.passphraseEnabled.toString())
+                                        rowComment("Indicates if the SSH key should have a passphrase or not.")
                                     }
                                 }
                             }
