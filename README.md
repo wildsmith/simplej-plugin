@@ -2,7 +2,8 @@
 
 A simple IntelliJ IDEA Plugin for teaching purposes and performing basic engineering tasks.
 
-<img src="https://raw.githubusercontent.com/wildsmith/simplej-plugin/refs/heads/main/logo.svg" alt="SimpleJ Logo" width="150">
+<img src="logo.svg" alt="SimpleJ Logo" width="150">
+<img src="/docs/images/simplej-menu.png" alt="SimpleJ Logo" width="600">
 
 SimpleJ should not be viewed as a utility in and of itself but rather a mechanism to inspire ideas for better DevEx while providing code samples.
 
