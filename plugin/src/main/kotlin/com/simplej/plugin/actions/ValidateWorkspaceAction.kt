@@ -40,6 +40,7 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
         )
         validateJava(project, simpleJConfig)
         validateSshConnection(project, simpleJConfig)
+        validateSshPassphrase(project, simpleJConfig)
         validateAndroidBuildToolsVersion(project, simpleJConfig)
     }
 
@@ -164,15 +165,15 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
                         SSH_VALIDATION_SUCCESS
                     )
                 } else {
-                    showSshError(project)
+                    showSshConnectionError(project)
                 }
             } catch (e: Exception) {
-                showSshError(project)
+                showSshConnectionError(project)
             }
         }
     }
 
-    private fun showSshError(project: Project) {
+    private fun showSshConnectionError(project: Project) {
         project.showError(
             """
                 SSH connection failed. Please check your SSH configuration:<br>
@@ -182,6 +183,66 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
             """.trimIndent(),
             SSH_VALIDATION_ERROR
         )
+    }
+
+    /**
+     * Validates the SSH key's passphrase protection against the `simplej-config.json` settings.
+     *
+     * This function checks if the SSH key specified by `workspaceCompat.ssh.keyPath` is passphrase-protected
+     * and compares this status against the `workspaceCompat.ssh.passphraseEnabled` setting.
+     *
+     * It uses the `ssh-keygen -y` command to attempt reading the public key from the private key file
+     * with an empty passphrase.
+     *
+     * - A success notification is shown if the configuration expects no passphrase (`passphraseEnabled = false`)
+     *   and the key is successfully read without one.
+     * - An error notification is shown if the actual state of the key mismatches the configuration, or if
+     *   the validation command fails for any reason.
+     * - The validation is skipped if `passphraseEnabled` or `keyPath` is not defined in the configuration.
+     *
+     * @param project The current project instance, used to display notifications.
+     * @param simpleJConfig The parsed SimpleJ configuration containing the SSH settings to validate.
+     */
+    private fun validateSshPassphrase(project: Project, simpleJConfig: SimpleJConfig) {
+        val passphraseEnabled = simpleJConfig.workspaceCompat?.ssh?.passphraseEnabled
+        val keyPath = simpleJConfig.workspaceCompat?.ssh?.keyPath
+        if (passphraseEnabled == null || keyPath.isNullOrBlank()) {
+            // Opt out of the ssh check when no state for passphrase or keypath have been configured
+            return
+        }
+
+        @Suppress("TooGenericExceptionCaught", "SwallowedException")
+        executeBackgroundTask {
+            try {
+                // Validate passphrase presence
+                val process = Runtime.getRuntime().exec(
+                    "ssh-keygen -y -P \"\" -f ${keyPath.removePrefix("/")}",
+                    null,
+                    File(System.getProperty("user.home"))
+                )
+                val input = process.inputStream.bufferedReader().readLine()
+                process.waitFor()
+
+                // If the output is the public key, then no passphrase was required
+                val publicKeyPrefix = "ssh-${keyPath.substringAfterLast("/").substringAfter("_")}"
+                if (!passphraseEnabled && input.startsWith(publicKeyPrefix)) {
+                    project.showNotification(
+                        "SSH key does not require a passphrase.",
+                        SSH_VALIDATION_SUCCESS
+                    )
+                } else {
+                    project.showError(
+                        "SSH key requires a passphrase when it shouldn't.",
+                        SSH_VALIDATION_ERROR
+                    )
+                }
+            } catch (e: Exception) {
+                project.showError(
+                    "SSH passphrase validation failed.",
+                    SSH_VALIDATION_ERROR
+                )
+            }
+        }
     }
 
     /**

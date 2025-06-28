@@ -72,10 +72,14 @@ internal data class WorkspaceCompat(
  * SSH configuration settings.
  *
  * @property testRepo The SSH endpoint used for testing connectivity
+ * @property keyPath Of the SSH key, this path is relative to the system property `user.home`
+ * @property passphraseEnabled Indicates if the SSH key should have a passphrase or not
  */
 @Serializable
 internal data class SshConfig(
-    val testRepo: String? = null
+    val testRepo: String? = null,
+    val keyPath: String? = null,
+    val passphraseEnabled: Boolean? = null
 )
 
 /**

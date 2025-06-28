@@ -15,12 +15,35 @@ import com.simplej.plugin.getSimpleJFile
 import com.simplej.plugin.simpleJConfig
 import java.io.File
 
+/**
+ * An action that generates a default `simplej-config.json` file and its associated templates.
+ *
+ * This action is available in the project view's context menu and is only visible if a
+ * `simplej-config.json` file does not already exist in the project's `config/simplej/` directory.
+ *
+ * When executed, it creates the following structure:
+ * ```
+ * <project_root>
+ * └── config/
+ *     └── simplej/
+ *         ├── simplej-config.json
+ *         └── templates/
+ *             ├── java-module/
+ *             │   └── build.gradle.kts
+ *             └── simplej-java-module/
+ *                 └── build.gradle.kts
+ * ```
+ *
+ * This provides a starting point for configuring the SimpleJ plugin with default settings
+ * for workspace compatibility, web browser mappings, and new module templates.
+ */
 internal class GenerateSimpleJConfigAction : SimpleJAnAction(), ProjectViewPopupMenuItem {
 
     override fun shouldShow(event: AnActionEvent, project: Project): Boolean {
         return project.simpleJConfig() == null
     }
 
+    @Suppress("ReturnCount")
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return event.showError("No valid project found within the workspace.")
         val projectFile = File(project.basePath!!).toVirtualFile() ?: return event.showError(
@@ -55,6 +78,8 @@ internal class GenerateSimpleJConfigAction : SimpleJAnAction(), ProjectViewPopup
     companion object {
 
         private const val DEFAULT_TEST_REPO = "git@github.com:wildsmith/simplej-plugin.git"
+        private const val DEFAULT_SSH_KEY_PATH = ".ssh/id_ed25519"
+        private const val DEFAULT_SSH_PASSPHRASE_ENABLED = false
         private const val DEFAULT_JAVA_VERSION = 17
         private const val DEFAULT_JAVA_HOME = "/Applications/Android Studio.app/Contents/jbr/Contents/Home"
         private val DEFAULT_ANDROID_BUILD_TOOLS_VERSION = "35.0.0".split(".")
@@ -64,7 +89,9 @@ internal class GenerateSimpleJConfigAction : SimpleJAnAction(), ProjectViewPopup
             {
               "workspaceCompat": {
                 "ssh": {
-                  "testRepo": "$DEFAULT_TEST_REPO"
+                  "testRepo": "$DEFAULT_TEST_REPO",
+                  "keyPath": "$DEFAULT_SSH_KEY_PATH",
+                  "passphraseEnabled": $DEFAULT_SSH_PASSPHRASE_ENABLED
                 },
                 "java": {
                   "home": "$DEFAULT_JAVA_HOME",
