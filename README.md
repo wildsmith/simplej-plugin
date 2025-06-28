@@ -65,7 +65,7 @@ Located at: [`config` > `simplej` > `simplej-config.json`](https://github.com/wi
 
 **W/SimpleJ**
 
-Right click > SimpleJ > New Module
+`Right click > SimpleJ > New Module`
 
 <img src="/docs/images/new-module-flow.png" alt="new module flow" width="600px"/>
 
@@ -78,7 +78,7 @@ Right click > SimpleJ > New Module
 
 **W/SimpleJ**
 
-Right click > SimpleJ > Delete Module
+`Right click > SimpleJ > Delete Module`
 
 <img src="/docs/images/module-deletion-flow.png" alt="module deletion flow" width="600px"/>
 
@@ -91,7 +91,7 @@ Right click > SimpleJ > Delete Module
 
 **W/SimpleJ**
 
-Right click > SimpleJ > Run... > ...
+`Right click > SimpleJ > Run... > ...`
 
 <img src="/docs/images/gradle-task-execution-flow.png" alt="gradle task execution flow" width="600px"/>
 
@@ -105,7 +105,7 @@ Right click > SimpleJ > Run... > ...
 
 **W/SimpleJ**
 
-Right click > SimpleJ > Open in Github
+`Right click > SimpleJ > Open in Github`
 
 <img src="/docs/images/github-interaction-flow.png" alt="github interaction flow" width="600px"/>
 
@@ -119,7 +119,7 @@ Right click > SimpleJ > Open in Github
 
 **W/SimpleJ**
 
-Right click > SimpleJ > Lookup Code Owner
+`Right click > SimpleJ > Lookup Code Owner`
 
 <img src="/docs/images/code-owner-lookup.png" alt="code owner lookup" width="600px"/>
 
@@ -133,7 +133,7 @@ Right click > SimpleJ > Lookup Code Owner
 
 **W/SimpleJ**
 
-Right click > SimpleJ > Validate Workspace
+`Right click > SimpleJ > Validate Workspace`
 
 <img src="/docs/images/workspace-validation.png" alt="workspace validation" width="600px"/>
 
@@ -146,7 +146,7 @@ Right click > SimpleJ > Validate Workspace
 
 **W/SimpleJ**
 
-Open mapped file > Click the globe icon
+`Open mapped file > Click the globe icon`
 
 ## Install
 
