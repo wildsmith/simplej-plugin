@@ -9,7 +9,6 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.process.CommandLineArgumentProvider
-import java.io.File
 
 /**
  * Configures the project as an IntelliJ Platform plugin.

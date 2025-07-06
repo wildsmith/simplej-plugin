@@ -159,7 +159,7 @@
             <separator/>
             <action
                 id="com.simplej.ValidateWorkspaceAction"
-                class="com.simplej.plugin.actions.ValidateWorkspaceAction"
+                class="com.simplej.plugin.actions.workspace.ValidateWorkspaceAction"
                 icon="AllIcons.General.GreenCheckmark"
                 text="Validate Workspace"/>
             <action

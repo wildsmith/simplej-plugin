@@ -79,7 +79,7 @@ internal class SimpleJSettingsConfigurable : Configurable {
                                     }
                                 }
                                 if (ssh.passphraseEnabled != null) {
-                                    row("SSH passphrase enabled:") {
+                                    row("SSH passphrase required:") {
                                         customTextField(ssh.passphraseEnabled.toString())
                                         rowComment("Indicates if the SSH key should have a passphrase or not.")
                                     }

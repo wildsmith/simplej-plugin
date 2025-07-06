@@ -15,11 +15,22 @@ simpleJ {
 }
 
 dependencies {
-    implementation(libs.compose.desktop.jvm.mac.os.arm)
-    implementation(libs.compose.material3)
+    implementation(libs.compose.desktop.jvm.mac.os.arm) {
+        // Excluding the transitive coroutine dependency as it
+        // conflicts with the bundled platform coroutine deps
+        // leading to jvm linkage errors.
+        exclude(module = "kotlinx-coroutines-core-jvm")
+    }
+    implementation(libs.compose.material3) {
+        // Excluding the transitive coroutine dependency as it
+        // conflicts with the bundled platform coroutine deps
+        // leading to jvm linkage errors.
+        exclude(module = "kotlinx-coroutines-core-jvm")
+    }
     implementation(libs.compose.runtime)
     implementation(libs.kotlinx.serialization)
     intellijPlatform {
         pluginModule(implementation(project(":base")))
+        bundledPlugin("org.jetbrains.kotlin")
     }
 }

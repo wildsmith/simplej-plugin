@@ -1,15 +1,18 @@
 // Use of this source code is governed by the Apache 2.0 license.
-package com.simplej.plugin.actions
+package com.simplej.plugin.actions.workspace
 
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.simplej.base.ProjectViewPopupMenuItem
 import com.simplej.base.SimpleJAnAction
 import com.simplej.base.extensions.executeBackgroundTask
 import com.simplej.base.extensions.showError
-import com.simplej.base.extensions.showNotification
-import com.simplej.plugin.SimpleJConfig
+import com.simplej.plugin.SimpleJCoroutineService
+import com.simplej.plugin.WorkspaceCompat
 import com.simplej.plugin.simpleJConfig
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Properties
 
@@ -33,15 +36,26 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
      *
      * @param event The action event containing the project context
      */
+    @Suppress("ReturnCount")
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return event.showError("No valid project found within the workspace.")
         val simpleJConfig = project.simpleJConfig() ?: return event.showError(
             "No valid `simplej-config.json` configuration file found within `${project.basePath}/config/simplej`!"
         )
-        validateJava(project, simpleJConfig)
-        validateSshConnection(project, simpleJConfig)
-        validateSshPassphrase(project, simpleJConfig)
-        validateAndroidBuildToolsVersion(project, simpleJConfig)
+        val workspaceCompat = simpleJConfig.workspaceCompat ?: return event.showError(
+            "No `workspaceCompat` configuration found within `simplej-config.json`!"
+        )
+
+        val workspaceValidation = WorkspaceValidation()
+        val coroutineService = service<SimpleJCoroutineService>()
+        coroutineService.scope.launch {
+            async { validateJavaVersion(workspaceCompat, workspaceValidation) }
+            async { validateJavaHome(workspaceCompat, workspaceValidation) }
+            async { validateSshConnection(workspaceCompat, workspaceValidation) }
+            async { validateSshPassphrase(workspaceCompat, workspaceValidation) }
+            async { validateAndroidBuildToolsVersion(project, workspaceCompat, workspaceValidation) }
+        }
+        ValidationDialog(project, coroutineService, workspaceCompat, workspaceValidation).show()
     }
 
     /**
@@ -50,13 +64,18 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
      * Checks either the Java version or Java home directory based on the configuration. If the Java version is
      * specified, it takes precedence over the Java home directory validation.
      *
-     * @param project The current project
-     * @param simpleJConfig The SimpleJ configuration
+     * @param workspaceCompat The WorkspaceCompat configuration
      */
-    private fun validateJava(project: Project, simpleJConfig: SimpleJConfig) {
-        val requiredJavaVersion = simpleJConfig.workspaceCompat?.java?.version
+    private fun validateJavaVersion(
+        workspaceCompat: WorkspaceCompat,
+        workspaceValidation: WorkspaceValidation
+    ) {
+        val requiredJavaVersion = workspaceCompat.java?.version
         if (requiredJavaVersion == null) {
-            validateJavaHome(project, simpleJConfig)
+            // Opt out of validation as no required java version has been configured
+            workspaceValidation.javaVersionCheck.value = ValidationState.Unnecessary(
+                "no Java version has been configured."
+            )
             return
         }
 
@@ -72,16 +91,17 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
                 process.waitFor()
                 javaVersion = output.firstOrNull()?.trim() ?: System.getProperty("java.version") ?: "Unknown"
             } catch (e: Exception) {
-                project.showNotification("Unable to determine Java version", JAVA_VALIDATION_ERROR)
+                workspaceValidation.javaVersionCheck.value = ValidationState.Failed("Unable to determine Java version")
                 return@executeBackgroundTask
             }
 
             if (requiredJavaVersion.matches(javaVersion)) {
-                project.showNotification("Java version is valid: $javaVersion", JAVA_VALIDATION_SUCCESS)
+                workspaceValidation.javaVersionCheck.value = ValidationState.Passed(
+                    "Valid Java version found, <code>$javaVersion</code>."
+                )
             } else {
-                project.showError(
-                    "Java version value is not compatible with required: $requiredJavaVersion",
-                    JAVA_VALIDATION_ERROR
+                workspaceValidation.javaVersionCheck.value = ValidationState.Failed(
+                    "Java version value is not compatible with required: $requiredJavaVersion"
                 )
             }
         }
@@ -93,32 +113,45 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
      * Checks if the system's `JAVA_HOME` environment variable or `java.home` property matches the configured
      * requirement in `simplej.json`.
      *
-     * @param project The current project
-     * @param simpleJConfig The SimpleJ configuration
+     * @param workspaceCompat The WorkspaceCompat configuration
      */
     @Suppress("ReturnCount")
-    private fun validateJavaHome(project: Project, simpleJConfig: SimpleJConfig) {
-        val requiredJavaHome = simpleJConfig.workspaceCompat?.java?.home
+    private fun validateJavaHome(
+        workspaceCompat: WorkspaceCompat,
+        workspaceValidation: WorkspaceValidation
+    ) {
+        val requiredJavaVersion = workspaceCompat.java?.version
+        if (requiredJavaVersion != null) {
+            // Opt out of validation as the java version has been configured
+            workspaceValidation.javaHomeCheck.value = ValidationState.Unnecessary(
+                "Java version has been configured."
+            )
+            return
+        }
+
+        val requiredJavaHome = workspaceCompat.java?.home
         if (requiredJavaHome.isNullOrBlank()) {
             // Opt out of validation as no required java home has been configured
+            workspaceValidation.javaHomeCheck.value = ValidationState.Unnecessary(
+                "no Java home has been configured."
+            )
             return
         }
 
         val javaHome = System.getenv("JAVA_HOME") ?: System.getProperty("java.home")
         if (javaHome.isNullOrEmpty()) {
-            project.showError("Java home variable is not set", JAVA_VALIDATION_ERROR)
+            workspaceValidation.javaHomeCheck.value = ValidationState.Failed("Java home variable is not set")
             return
         }
 
         if (requiredJavaHome != javaHome) {
-            project.showError(
-                "Java home path is not compatible with required: $requiredJavaHome",
-                JAVA_VALIDATION_ERROR
+            workspaceValidation.javaHomeCheck.value = ValidationState.Failed(
+                "Java home path is not compatible with required: $requiredJavaHome"
             )
             return
         }
 
-        project.showNotification("Java home is valid: $javaHome", JAVA_VALIDATION_SUCCESS)
+        workspaceValidation.javaHomeCheck.value = ValidationState.Passed("Java home is valid: $javaHome")
     }
 
     /**
@@ -126,20 +159,21 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
      *
      * Tests the SSH connection by attempting to authenticate with GitHub using the configured SSH test endpoint.
      *
-     * @param project The current project
-     * @param simpleJConfig The SimpleJ configuration
+     * @param workspaceCompat The WorkspaceCompat configuration
      */
-    private fun validateSshConnection(project: Project, simpleJConfig: SimpleJConfig) {
-        val githubUrl = simpleJConfig.workspaceCompat?.ssh?.testRepo
+    private fun validateSshConnection(workspaceCompat: WorkspaceCompat, workspaceValidation: WorkspaceValidation) {
+        val githubUrl = workspaceCompat.ssh?.testRepo
         if (githubUrl.isNullOrBlank()) {
             // Opt out of the ssh check when no test endpoint has been configured
+            workspaceValidation.sshConnectionCheck.value = ValidationState.Unnecessary(
+                "no test endpoint has been configured."
+            )
             return
         }
 
         if (!githubUrl.matches(Regex("git@github(.*)\\.com:.+/.+\\.git"))) {
-            project.showNotification(
+            workspaceValidation.sshConnectionCheck.value = ValidationState.Failed(
                 "Invalid GitHub SSH URL format. Expected format: git@github.com:username/repo.git",
-                SSH_VALIDATION_ERROR
             )
             return
         }
@@ -160,28 +194,26 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
                 // GitHub's SSH test always returns exit code 1 even on success
                 // We need to check the error output for the expected message
                 if (error.contains("successfully authenticated", true)) {
-                    project.showNotification(
+                    workspaceValidation.sshConnectionCheck.value = ValidationState.Passed(
                         "SSH connection to GitHub was successful.",
-                        SSH_VALIDATION_SUCCESS
                     )
                 } else {
-                    showSshConnectionError(project)
+                    showSshConnectionError(workspaceValidation)
                 }
             } catch (e: Exception) {
-                showSshConnectionError(project)
+                showSshConnectionError(workspaceValidation)
             }
         }
     }
 
-    private fun showSshConnectionError(project: Project) {
-        project.showError(
+    private fun showSshConnectionError(workspaceValidation: WorkspaceValidation) {
+        workspaceValidation.sshConnectionCheck.value = ValidationState.Failed(
             """
                 SSH connection failed. Please check your SSH configuration:<br>
                  1. Ensure SSH keys are generated (~/.ssh/id_rsa and ~/.ssh/id_rsa.pub)<br>
                  2. Verify your public key is added to GitHub<br>
                  3. Check if ssh-agent is running
             """.trimIndent(),
-            SSH_VALIDATION_ERROR
         )
     }
 
@@ -200,14 +232,16 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
      *   the validation command fails for any reason.
      * - The validation is skipped if `passphraseEnabled` or `keyPath` is not defined in the configuration.
      *
-     * @param project The current project instance, used to display notifications.
-     * @param simpleJConfig The parsed SimpleJ configuration containing the SSH settings to validate.
+     * @param workspaceCompat The parsed WorkspaceCompat configuration containing the SSH settings to validate.
      */
-    private fun validateSshPassphrase(project: Project, simpleJConfig: SimpleJConfig) {
-        val passphraseEnabled = simpleJConfig.workspaceCompat?.ssh?.passphraseEnabled
-        val keyPath = simpleJConfig.workspaceCompat?.ssh?.keyPath
+    private fun validateSshPassphrase(workspaceCompat: WorkspaceCompat, workspaceValidation: WorkspaceValidation) {
+        val passphraseEnabled = workspaceCompat.ssh?.passphraseEnabled
+        val keyPath = workspaceCompat.ssh?.keyPath
         if (passphraseEnabled == null || keyPath.isNullOrBlank()) {
             // Opt out of the ssh check when no state for passphrase or keypath have been configured
+            workspaceValidation.sshPassphraseCheck.value = ValidationState.Unnecessary(
+                "no ssh passphrase state or keypath has been configured."
+            )
             return
         }
 
@@ -226,20 +260,17 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
                 // If the output is the public key, then no passphrase was required
                 val publicKeyPrefix = "ssh-${keyPath.substringAfterLast("/").substringAfter("_")}"
                 if (!passphraseEnabled && input.startsWith(publicKeyPrefix)) {
-                    project.showNotification(
-                        "SSH key does not require a passphrase.",
-                        SSH_VALIDATION_SUCCESS
+                    workspaceValidation.sshPassphraseCheck.value = ValidationState.Passed(
+                        "SSH key does not require a passphrase."
                     )
                 } else {
-                    project.showError(
-                        "SSH key requires a passphrase when it shouldn't.",
-                        SSH_VALIDATION_ERROR
+                    workspaceValidation.sshPassphraseCheck.value = ValidationState.Failed(
+                        "SSH key requires a passphrase when it shouldn't."
                     )
                 }
             } catch (e: Exception) {
-                project.showError(
-                    "SSH passphrase validation failed.",
-                    SSH_VALIDATION_ERROR
+                workspaceValidation.sshPassphraseCheck.value = ValidationState.Failed(
+                    "SSH passphrase validation failed."
                 )
             }
         }
@@ -251,16 +282,24 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
      * property into a `local.properties` file at the root of every Android project.
      */
     @Suppress("ReturnCount")
-    private fun validateAndroidBuildToolsVersion(project: Project, simpleJConfig: SimpleJConfig) {
-        // Opt out of the buildTools check when as it hasn't been configured
-        val requiredBuildTools = simpleJConfig.workspaceCompat?.android?.buildTools
-            ?: return
+    private fun validateAndroidBuildToolsVersion(
+        project: Project,
+        workspaceCompat: WorkspaceCompat,
+        workspaceValidation: WorkspaceValidation
+    ) {
+        val requiredBuildTools = workspaceCompat.android?.buildTools
+        if (requiredBuildTools == null) {
+            // Opt out of the buildTools check when as it hasn't been configured
+            workspaceValidation.androidBuildToolsCheck.value = ValidationState.Unnecessary(
+                "no Android build tools version has been configured."
+            )
+            return
+        }
 
         val localProperties = File("${project.basePath}/local.properties")
         if (!localProperties.exists()) {
-            project.showError(
-                "Unable to find local.properties file within the project workspace.",
-                ANDROID_BUILD_TOOLS_VALIDATION_ERROR
+            workspaceValidation.androidBuildToolsCheck.value = ValidationState.Failed(
+                "Unable to find local.properties file within the project workspace."
             )
             return
         }
@@ -275,25 +314,14 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
             ?.filter { it.isDirectory }
             ?.any { requiredBuildTools.matches(it.name) }
         if (hasMatchingBuildToolsInstalled == true) {
-            project.showNotification(
-                "Android Build tools version is compatible.",
-                ANDROID_BUILD_TOOLS_VALIDATION_SUCCESS
+            workspaceValidation.androidBuildToolsCheck.value = ValidationState.Passed(
+                "Build tools version is compatible."
             )
         } else {
-            project.showError(
+            workspaceValidation.androidBuildToolsCheck.value = ValidationState.Failed(
                 "Unable to find matching build tools installed in Android SDK: $requiredBuildTools",
-                ANDROID_BUILD_TOOLS_VALIDATION_ERROR
             )
             return
         }
-    }
-
-    private companion object {
-        private const val SSH_VALIDATION_ERROR = "SSH Validation Error"
-        private const val SSH_VALIDATION_SUCCESS = "SSH Validation Success"
-        private const val JAVA_VALIDATION_ERROR = "Java Validation Error"
-        private const val JAVA_VALIDATION_SUCCESS = "Java Validation Success"
-        private const val ANDROID_BUILD_TOOLS_VALIDATION_ERROR = "Android Build Tools Validation Error"
-        private const val ANDROID_BUILD_TOOLS_VALIDATION_SUCCESS = "Android Build Tools Validation Success"
     }
 }
