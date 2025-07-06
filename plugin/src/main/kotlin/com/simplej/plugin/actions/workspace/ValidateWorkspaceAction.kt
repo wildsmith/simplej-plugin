@@ -11,7 +11,6 @@ import com.simplej.base.extensions.showError
 import com.simplej.plugin.SimpleJCoroutineService
 import com.simplej.plugin.WorkspaceCompat
 import com.simplej.plugin.simpleJConfig
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Properties
@@ -48,12 +47,14 @@ internal class ValidateWorkspaceAction : SimpleJAnAction(), ProjectViewPopupMenu
 
         val workspaceValidation = WorkspaceValidation()
         val coroutineService = service<SimpleJCoroutineService>()
-        coroutineService.scope.launch {
-            async { validateJavaVersion(workspaceCompat, workspaceValidation) }
-            async { validateJavaHome(workspaceCompat, workspaceValidation) }
-            async { validateSshConnection(workspaceCompat, workspaceValidation) }
-            async { validateSshPassphrase(workspaceCompat, workspaceValidation) }
-            async { validateAndroidBuildToolsVersion(project, workspaceCompat, workspaceValidation) }
+        listOf(
+            { validateJavaVersion(workspaceCompat, workspaceValidation) },
+            { validateJavaHome(workspaceCompat, workspaceValidation) },
+            { validateSshConnection(workspaceCompat, workspaceValidation) },
+            { validateSshPassphrase(workspaceCompat, workspaceValidation) },
+            { validateAndroidBuildToolsVersion(project, workspaceCompat, workspaceValidation) }
+        ).forEach {
+            coroutineService.scope.launch { it() }
         }
         ValidationDialog(project, coroutineService, workspaceCompat, workspaceValidation).show()
     }
