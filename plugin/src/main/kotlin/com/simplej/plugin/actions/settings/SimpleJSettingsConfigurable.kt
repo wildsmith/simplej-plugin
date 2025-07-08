@@ -55,12 +55,10 @@ internal class SimpleJSettingsConfigurable : Configurable {
                 simpleJConfig.workspaceCompat?.let { workspaceCompat ->
                     group("Workspace Compat", indent = false) {
                         row {
-                            text(
-                                "Workspace compatability is determined by <code>config > simplej.json</code>. Talk " +
-                                        "with the file owner before making changes."
-                            ).applyToComponent {
-                                insets.left = 0
-                            }
+                            text(WORKSPACE_COMPAT_INFO)
+                                .applyToComponent {
+                                    insets.left = 0
+                                }
                         }
                         indent {
                             workspaceCompat.ssh?.let { ssh ->
@@ -201,5 +199,12 @@ internal class SimpleJSettingsConfigurable : Configurable {
         find { it.name == taskState.name }?.let {
             taskState.enabled = it.enabled
         }
+    }
+
+    internal companion object {
+
+        const val WORKSPACE_COMPAT_INFO =
+            "Workspace compatability is determined by <code>config > simplej.json</code>. Talk " +
+                    "with the file owner before making changes."
     }
 }

@@ -31,6 +31,5 @@ dependencies {
     implementation(libs.kotlinx.serialization)
     intellijPlatform {
         pluginModule(implementation(project(":base")))
-        bundledPlugin("org.jetbrains.kotlin")
     }
 }

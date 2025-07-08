@@ -13,11 +13,14 @@ import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.AsyncProcessIcon
-import com.simplej.plugin.SimpleJCoroutineService
 import com.simplej.plugin.WorkspaceCompat
+import com.simplej.plugin.actions.settings.SimpleJSettingsConfigurable
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.awt.event.ActionEvent
+import javax.swing.Action
 
 /**
  * A dialog that displays the real-time status of various workspace validation checks.
@@ -27,13 +30,13 @@ import kotlinx.coroutines.launch
  * or was unnecessary.
  *
  * @param project The current IntelliJ project.
- * @param coroutineService The service used to launch and manage coroutines for observing validation state.
+ * @param coroutineScope The scope used to launch and manage coroutines for observing validation state.
  * @param workspaceCompat The configuration object that specifies which validations to perform.
  * @param workspaceValidation The object that holds the state of each validation check.
  */
 internal class ValidationDialog(
-    project: Project,
-    private val coroutineService: SimpleJCoroutineService,
+    private val project: Project,
+    private val coroutineScope: CoroutineScope,
     private val workspaceCompat: WorkspaceCompat,
     private val workspaceValidation: WorkspaceValidation
 ) : DialogWrapper(project, true) {
@@ -47,9 +50,14 @@ internal class ValidationDialog(
 
     init {
         title = "Validating Workspace"
-        isOKActionEnabled = true
         isResizable = false
         init()
+    }
+
+    override fun createActions(): Array<Action> {
+        val copyAction = CopyAndCloseAction()
+        copyAction.putValue(DEFAULT_ACTION, true)
+        return arrayOf(copyAction, CloseAction())
     }
 
     /**
@@ -61,6 +69,9 @@ internal class ValidationDialog(
      * @return The [DialogPanel] containing all the UI elements.
      */
     override fun createCenterPanel(): DialogPanel = panel {
+        row {
+            text(SimpleJSettingsConfigurable.WORKSPACE_COMPAT_INFO)
+        }
         workspaceCompat.java?.let { java ->
             group("Java Checks") {
                 java.version?.let { version ->
@@ -94,7 +105,8 @@ internal class ValidationDialog(
                 ssh.passphraseEnabled?.let { passphraseEnabled ->
                     rowChecks(
                         rowLabel = "Passphrase:",
-                        rowComment = "Passphrase required: <code>$passphraseEnabled</code><br>" + "Key path: <code>${ssh.keyPath}</code>",
+                        rowComment = "Passphrase required: <code>$passphraseEnabled</code><br>" +
+                                "Key path: <code>${ssh.keyPath}</code>",
                         visibleStates = sshPassphrasePanel,
                         stateFlow = workspaceValidation.sshPassphraseCheck
                     )
@@ -152,7 +164,7 @@ internal class ValidationDialog(
             }
         }.visibleIf(visibleStates.unnecessary)
         jobs.add(
-            coroutineService.scope.launch {
+            coroutineScope.launch {
                 stateFlow.collect(visibleStates)
             })
         rowComment(rowComment)
@@ -169,8 +181,8 @@ internal class ValidationDialog(
      */
     private suspend fun MutableStateFlow<ValidationState>.collect(visibleStates: VisibleStates) {
         collect { state ->
-            state.message?.let { message -> visibleStates.message.set(message) }
             if (state !is ValidationState.Loading) visibleStates.loading.set(false)
+            if (state.message != null) visibleStates.message.set(state.message)
             when (state) {
                 is ValidationState.Passed -> visibleStates.passed.set(true)
                 is ValidationState.Failed -> visibleStates.failed.set(true)
@@ -183,8 +195,8 @@ internal class ValidationDialog(
     /**
      * Disposes of the dialog and cancels any running coroutines.
      *
-     * This is overridden to ensure that all background jobs observing validation states
-     * are cancelled when the dialog is closed, preventing resource leaks.
+     * This is overridden to ensure that all background jobs observing validation states are canceled when the dialog
+     * is closed, preventing resource leaks.
      */
     override fun dispose() {
         jobs.forEach { it.cancel() }
@@ -207,4 +219,33 @@ internal class ValidationDialog(
         val unnecessary: AtomicMutableBooleanProperty = AtomicBooleanProperty(false),
         val message: ObservableMutableProperty<String> = AtomicProperty("")
     )
+
+    /**
+     * Represents an action that performs two primary tasks:
+     * - Copies the relevant data or content to a target (e.g., clipboard, file, etc.).
+     * - Closes the associated context, such as a dialog or process, after completing the copy operation.
+     *
+     * This action is typically used to streamline workflows where users need to extract and save information and
+     * subsequently close the UI or tool associated with the action.
+     */
+    private inner class CopyAndCloseAction : DialogWrapperAction("Copy and Close") {
+
+        override fun doAction(event: ActionEvent?) {
+            CopyWorkspaceInfoAction.copyWorkspaceInfo(project, workspaceCompat)
+            close(OK_EXIT_CODE)
+        }
+    }
+
+    /**
+     * Represents an action that closes a specific UI component, dialog, or process.
+     *
+     * This action is typically used to simplify workflows where a user-triggered event (e.g., button press or menu
+     * selection) is meant to signal the closure of an active item, such as a window, tool window, or editor session.
+     */
+    private inner class CloseAction : DialogWrapperAction("Close") {
+
+        override fun doAction(event: ActionEvent?) {
+            close(OK_EXIT_CODE)
+        }
+    }
 }

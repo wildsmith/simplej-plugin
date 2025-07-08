@@ -61,6 +61,17 @@
 
     <actions>
         <group
+            id="com.simplej.TopSeparator"
+            class="com.simplej.base.SimpleJActionGroup">
+            <separator/>
+            <add-to-group
+                group-id="ProjectViewPopupMenu"
+                anchor="first"/>
+            <add-to-group
+                group-id="EditorPopupMenu"
+                anchor="first"/>
+        </group>
+        <group
             id="com.simplej.ActionGroup"
             class="com.simplej.base.SimpleJActionGroup"
             text="SimpleJ"
@@ -162,6 +173,11 @@
                 class="com.simplej.plugin.actions.workspace.ValidateWorkspaceAction"
                 icon="AllIcons.General.GreenCheckmark"
                 text="Validate Workspace"/>
+            <action
+                id="com.simplej.CopyBuildInfoAction"
+                class="com.simplej.plugin.actions.workspace.CopyWorkspaceInfoAction"
+                icon="AllIcons.Actions.ProfileMemory"
+                text="Copy Workspace Info"/>
             <action
                 id="com.simplej.plugin.actions.GenerateSimpleJConfigAction"
                 class="com.simplej.plugin.actions.GenerateSimpleJConfigAction"
